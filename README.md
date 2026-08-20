@@ -1,40 +1,32 @@
-# AI Price Bot
+# OXWeb Prices
 
-Live price intelligence for AI models and API gateways.
+Fast AI inference price comparison under the OXWeb ecosystem.
 
-## Product thesis
-
-AI users increasingly buy the same underlying model through different providers, routers, gateways, resellers and discounted compute marketplaces. The displayed model name may be identical while the effective price differs because of token rates, cache pricing, platform fees, prepaid bonuses, discount multipliers, plans, quotas and temporary promotions.
-
-AI Price Bot should answer one question quickly:
-
-> Where is the cheapest trustworthy place to use this exact AI model right now?
+Repository: `Tangieff/ai-api-prices`
+Planned public home: `prices.oxweb.xyz` (deployment is not part of the initial build task).
 
 ## MVP
 
-1. Web landing + searchable comparison table.
-2. Normalize the same model across multiple providers.
-3. Show input/output/cache prices and effective discount vs official/reference price.
-4. Preserve price history and show recent changes.
-5. Telegram bot / alerts for price drops, new models and provider changes.
-6. Every price row must expose source, last checked time and confidence/verification state.
+The first release compares published prices across a deliberately small set of discount AI inference providers:
 
-## Initial provider classes
+- Surplus Intelligence
+- derouter.ai
+- ClawHive
+- ClaudeAPI.cheap
+- GetGoAPI
 
-- Multi-model marketplaces / routers: OpenRouter, Requesty, MixRoute, PPQ.ai, Kie.ai.
-- Discount / surplus marketplaces: Surplus and similar providers discovered during research.
-- Direct inference providers where the same open model can have materially different prices: DeepInfra, Together AI, Fireworks AI, Novita AI, Groq and others.
-- Direct model vendors are reference-price sources, not necessarily competitors: OpenAI, Anthropic, Google, DeepSeek, xAI, Mistral, Alibaba/Qwen, Zhipu/GLM, Moonshot/Kimi.
+Users search a model, compare input/output prices, optionally see a meaningful discount percentage, and visit the provider.
 
-## Core rule
+The product intentionally does **not** perform provider audits, trust ratings or model-authenticity verification.
 
-Never compare only headline token prices. Compute an `effective_price` from all known price mechanics and keep raw source data so every result is auditable.
+## Start here for engineering
 
-## Repo guidance
+Use the public specification and tests in this repository as the implementation source of truth.
 
+## Implementation kickoff
 
+Implement against the public specification, then run the documented quality checks before release.
 
+## Current state
 
-- `docs/MVP_SPEC.md` — MVP behavior and data model.
-
-No production deployment, paid service signup, secret creation, or destructive migration without explicit approval.
+The public product specification is prepared for implementation.
