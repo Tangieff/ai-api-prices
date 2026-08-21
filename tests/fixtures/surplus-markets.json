@@ -1,0 +1,48 @@
+{
+  "markets": [
+    {
+      "model": "claude-opus-4-8-fast",
+      "best_input_per_1m": 4195800,
+      "best_output_per_1m": 20979000,
+      "best_cache_read_per_1m": 419580,
+      "best_cache_write_per_1m": 5244750,
+      "direct_input_per_1m": 12000000,
+      "direct_output_per_1m": 60000000,
+      "media_unit": null,
+      "seller_count": 162
+    },
+    {
+      "model": "veo3-1-full-image-to-video",
+      "best_input_per_1m": 0,
+      "best_output_per_1m": 0,
+      "best_cache_read_per_1m": null,
+      "best_cache_write_per_1m": null,
+      "direct_input_per_1m": 0,
+      "direct_output_per_1m": 0,
+      "media_unit": "job",
+      "seller_count": 58
+    },
+    {
+      "model": "claude-opus-4.6",
+      "best_input_per_1m": 500000,
+      "best_output_per_1m": 2499999,
+      "best_cache_read_per_1m": 50000,
+      "best_cache_write_per_1m": 625000,
+      "direct_input_per_1m": 5000000,
+      "direct_output_per_1m": 25000000,
+      "media_unit": null,
+      "seller_count": 335
+    },
+    {
+      "model": "gpt-5.5",
+      "best_input_per_1m": 437500,
+      "best_output_per_1m": 2624999,
+      "best_cache_read_per_1m": 43750,
+      "best_cache_write_per_1m": 437500,
+      "direct_input_per_1m": 6250000,
+      "direct_output_per_1m": 37500000,
+      "media_unit": null,
+      "seller_count": 341
+    }
+  ]
+}

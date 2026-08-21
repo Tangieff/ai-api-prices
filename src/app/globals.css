@@ -1,0 +1,695 @@
+/*
+ * OXWeb Prices — visual system.
+ *
+ * The brief is a market terminal that a non-trader can read: dense numeric
+ * tables, tabular figures, hairline rules, almost no chrome. Colour is used
+ * only where it carries meaning (the saving badge, the cheapest row), never as
+ * decoration — no gradients, no glow, no glass, and specifically no acid green.
+ *
+ * One accent (deep ink blue) for anything interactive, one highlight (ochre)
+ * for money saved. Everything else is paper and ink.
+ */
+
+:root {
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --surface-sunken: #efeee9;
+  --ink: #15161a;
+  --ink-soft: #55575e;
+  --ink-faint: #8a8c93;
+  --rule: #e0ded7;
+  --rule-strong: #c9c6bd;
+
+  --accent: #1b3a6b;
+  --accent-hover: #14294c;
+  --accent-wash: #e8edf5;
+
+  --save-bg: #f4e7cd;
+  --save-ink: #7a4a10;
+  --best-bg: #fbf7ee;
+  --warn-bg: #f8eae6;
+  --warn-ink: #8c3a24;
+
+  --radius: 6px;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121316;
+    --surface: #191a1e;
+    --surface-sunken: #1f2025;
+    --ink: #e9e7e2;
+    --ink-soft: #a4a6ad;
+    --ink-faint: #7c7e86;
+    --rule: #2a2b31;
+    --rule-strong: #3a3c43;
+
+    --accent: #8fb0e0;
+    --accent-hover: #b3c9ec;
+    --accent-wash: #1b2432;
+
+    --save-bg: #372c17;
+    --save-ink: #e3bd7c;
+    --best-bg: #1d1e1a;
+    --warn-bg: #3a221c;
+    --warn-ink: #e5a892;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ---------------------------------------------------------------- header -- */
+
+.site-header {
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 58px;
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.wordmark__mark {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  padding: 3px 6px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  color: var(--ink-soft);
+}
+
+.header-link {
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.header-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* ------------------------------------------------------------------ hero -- */
+
+.hero {
+  padding: 44px 0 26px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.hero h1 {
+  margin: 0 0 10px;
+  font-size: clamp(26px, 4.4vw, 38px);
+  line-height: 1.15;
+  letter-spacing: -0.022em;
+  font-weight: 700;
+  max-width: 20ch;
+}
+
+.hero p {
+  margin: 0 0 22px;
+  max-width: 62ch;
+  color: var(--ink-soft);
+  font-size: 15.5px;
+}
+
+.search {
+  position: relative;
+  max-width: 520px;
+}
+
+.search input {
+  width: 100%;
+  padding: 12px 40px 12px 14px;
+  font: inherit;
+  font-size: 16px; /* 16px keeps iOS from zooming the viewport on focus */
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+}
+
+.search input::placeholder {
+  color: var(--ink-faint);
+}
+
+/* WebKit renders its own clear affordance for type="search". The styled button
+   replaces it, so hide the native one rather than showing two. */
+.search input::-webkit-search-cancel-button,
+.search input::-webkit-search-decoration {
+  appearance: none;
+  display: none;
+}
+
+.search input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.search__clear {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink-faint);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.search__clear:hover {
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+
+.hint {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.hint button {
+  border: 0;
+  background: none;
+  padding: 0 1px;
+  font: inherit;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ------------------------------------------------------------ stats strip -- */
+
+.stats {
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.stats__inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.stats b {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------- results -- */
+
+.results {
+  padding: 26px 0 60px;
+}
+
+.results__meta {
+  margin: 0 0 18px;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.model {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.model__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-sunken);
+}
+
+.model__name {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.chip {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.model__summary {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.model__summary b {
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+/* ----------------------------------------------------------------- table -- */
+
+.offers {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.offers th {
+  text-align: right;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+.offers th:first-child,
+.offers td:first-child {
+  text-align: left;
+  padding-left: 16px;
+}
+
+.offers th:last-child,
+.offers td:last-child {
+  padding-right: 16px;
+}
+
+.offers td {
+  text-align: right;
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: middle;
+}
+
+.offers tr:last-child td {
+  border-bottom: 0;
+}
+
+.offers tr[data-best='true'] {
+  background: var(--best-bg);
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+
+.num--lead {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.num--muted {
+  color: var(--ink-faint);
+}
+
+.provider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.provider__name {
+  font-weight: 550;
+}
+
+.badge-best {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  padding: 0 4px;
+}
+
+.badge-save {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--save-ink);
+  background: var(--save-bg);
+  border-radius: 3px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+.tag-tier,
+.tag-seed {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--ink-faint);
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.tag-stale {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--warn-ink);
+  background: var(--warn-bg);
+  border-radius: 3px;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.visit {
+  display: inline-block;
+  padding: 6px 13px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--surface);
+  background: var(--accent);
+  border-radius: 4px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.visit:hover {
+  background: var(--accent-hover);
+}
+
+@media (prefers-color-scheme: dark) {
+  .visit {
+    color: #12131a;
+  }
+}
+
+/* ------------------------------------------------------------ empty state -- */
+
+.empty {
+  padding: 44px 20px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.empty h2 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+
+.empty p {
+  margin: 0 0 16px;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.button-quiet {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+
+.button-quiet:hover {
+  border-color: var(--accent);
+}
+
+.more {
+  display: block;
+  margin: 18px auto 0;
+}
+
+/* ---------------------------------------------------------------- footer -- */
+
+.site-footer {
+  border-top: 1px solid var(--rule);
+  background: var(--surface);
+  padding: 28px 0 44px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+  gap: 26px;
+}
+
+.site-footer h2 {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.site-footer p {
+  margin: 0 0 8px;
+}
+
+.source-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.source-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.source-list__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.source-list__blurb {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-faint);
+}
+
+.source-list li:last-child {
+  border-bottom: 0;
+}
+
+.source-list__count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.colophon {
+  margin-top: 26px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+/* ----------------------------------------------------------------- mobile -- */
+
+@media (max-width: 720px) {
+  .hero {
+    padding: 28px 0 22px;
+  }
+
+  .hero p {
+    font-size: 15px;
+  }
+
+  .stats__inner {
+    gap: 4px 18px;
+  }
+
+  .model__summary {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  /* The offer table becomes a stack of cards: each row is a block and each
+     cell prints its own header from data-label. One DOM, two layouts. */
+  .offers thead {
+    display: none;
+  }
+
+  .offers,
+  .offers tbody,
+  .offers tr,
+  .offers td {
+    display: block;
+    width: 100%;
+  }
+
+  .offers tr {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .offers tr:last-child {
+    border-bottom: 0;
+  }
+
+  .offers td {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: right;
+    padding: 3px 0;
+    border-bottom: 0;
+  }
+
+  .offers td::before {
+    content: attr(data-label);
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    text-align: left;
+  }
+
+  .offers td:first-child,
+  .offers td:last-child {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .offers td[data-label='Provider'] {
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .offers td[data-label='Provider']::before {
+    display: none;
+  }
+
+  .offers td[data-label='Visit'] {
+    display: block;
+    margin-top: 10px;
+  }
+
+  .offers td[data-label='Visit']::before {
+    display: none;
+  }
+
+  .visit {
+    display: block;
+    text-align: center;
+    padding: 10px;
+  }
+
+  /* Cells with nothing to say add noise in a card; hide them entirely. */
+  .offers td[data-empty='true'] {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------- a11y -- */
+
+/* Present to assistive technology, absent visually — used for table captions
+   and control labels that the visual design carries by position instead. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

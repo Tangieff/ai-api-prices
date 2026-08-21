@@ -25,12 +25,14 @@ Use these five providers for MVP launch coverage. This is a product seed, not a 
 - Preferred adapter: public page parser.
 - Current public page advertises Claude pricing at 50% below direct pricing and includes input/output values.
 
-## 4. ClaudeAPI.cheap
+## 4. WorldGate
 
-- Website: `https://claudeapi.cheap/`
-- Pricing is publicly visible on the homepage.
+- Website: `https://worldgateapi.com/` (`worldgateapi.fun` redirects here)
+- Pricing is publicly visible on the homepage, one table per model family.
 - Preferred adapter: public page parser.
-- Important: pricing can vary by Basic vs Pro plan. Preserve plan/tier in raw adapter metadata if needed; MVP may show clearly labeled separate offers or choose the free/basic publicly accessible tier as the default comparison. Do not silently mix tiers.
+- Columns are `Model | Input | Output | Cache R | Cache W | Official I/O | Discount`, and every price cell carries the canonical USD value in a `data-price-usd` attribute. Read the attribute, not the cell text: the page's script rewrites the text into the visitor's billing currency on load, and the server-rendered text can lag the attribute.
+- `Official I/O` currently renders as `—` for every model, so rows carry no reference price and show no discount. The same script fills that cell from `data-official-input-usd` / `data-official-output-usd`, so the parser reads those attributes for the day they appear.
+- Replaces ClaudeAPI.cheap, which was in the original seed list but publishes no DNS A/AAAA/CNAME record and therefore has no reachable pricing page.
 
 ## 5. GetGoAPI
 
