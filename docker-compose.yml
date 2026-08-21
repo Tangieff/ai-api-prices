@@ -1,0 +1,32 @@
+# AI API Prices — public deployment template.
+#
+# Host binding and ingress configuration are environment-specific and are not
+# recorded in this repository.
+
+name: oxweb-prices
+
+services:
+  app:
+    build:
+      context: .
+      target: runner
+      args:
+        NEXT_PUBLIC_OXWEB_URL: ${NEXT_PUBLIC_OXWEB_URL:-https://oxweb.xyz}
+    image: oxweb-prices-app:latest
+    restart: unless-stopped
+    cpus: "1.0"
+    mem_limit: 512m
+    ports:
+      - "${APP_BIND_HOST:?set APP_BIND_HOST}:${APP_PORT:?set APP_PORT}:3000"
+    volumes:
+      - ./data:/app/data
+
+  refresh:
+    profiles: ["refresh"]
+    build:
+      context: .
+      target: refresh
+    image: oxweb-prices-refresh:latest
+    restart: "no"
+    volumes:
+      - ./data:/app/data

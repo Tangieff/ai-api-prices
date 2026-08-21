@@ -1,0 +1,32 @@
+# Build context for the OXWeb Prices image.
+#
+# Keep this tight: everything listed here is either rebuilt inside the image,
+# irrelevant to it, or must never reach an image layer at all.
+
+# Secrets. Nothing in the build needs an env file, and excluding them also
+# stops `next build` from silently picking up host values.
+.env
+.env.*
+
+# Rebuilt in the image
+node_modules/
+.next/
+out/
+dist/
+coverage/
+
+# Not needed to build or run the app
+.git/
+.github/
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose*.yml
+*.log
+*.tsbuildinfo
+.DS_Store
+
+# Docs and design registry: read by people, not by the build
+*.md
+docs/
+.styleseed/

@@ -138,6 +138,9 @@ src/lib/                      money, models, search, scoring, dataset, view mode
 src/refresh/run.ts            concurrent refresh with per-provider isolation
 src/app/                      Next.js App Router page and components
 tests/                        unit and parser tests, with captured fixtures
+Dockerfile                    production image: the server, and the refresh one-shot
+docker-compose.yml            the stack, local only
+
 ```
 
 ## Configuration
@@ -147,6 +150,17 @@ No credentials or paid services are required. One optional variable:
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `NEXT_PUBLIC_OXWEB_URL` | `https://oxweb.xyz` | Destination of the header's OXWeb link |
+
+## Deployment
+
+Build and run the application with environment-specific network settings supplied outside the repository:
+
+```bash
+docker compose up -d --build
+docker compose --profile refresh run --rm refresh
+```
+
+Credentials, ingress configuration and operator procedures are intentionally not stored here.
 
 ## Stack
 
