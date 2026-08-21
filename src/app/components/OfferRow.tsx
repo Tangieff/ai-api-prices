@@ -9,6 +9,10 @@ import { updatedLabel, utcStamp } from './format';
  * name once the table collapses into cards on narrow screens — so the mobile
  * layout needs no separate markup. `data-empty` lets those card layouts drop
  * cells that would otherwise read "Cache —".
+ *
+ * Only the cheapest row carries the filled action. Giving every row the same
+ * bright button would make the page a wall of equal calls to action and hide
+ * the one answer the visitor came for.
  */
 export function OfferRow({
   offer,
@@ -63,7 +67,7 @@ export function OfferRow({
 
       <td data-label="Visit">
         <a
-          className="visit"
+          className={offer.is_best ? 'visit visit--primary' : 'visit'}
           href={provider.visit_url}
           target="_blank"
           rel="noopener noreferrer nofollow"

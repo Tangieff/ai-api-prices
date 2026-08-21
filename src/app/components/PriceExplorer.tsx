@@ -63,11 +63,11 @@ export function PriceExplorer({
     <>
       <div className="hero">
         <div className="shell">
-          <h1>Stop overpaying for AI model access</h1>
-          <p>
-            The same models are resold at very different prices. Search a model to see what each
-            discount provider currently charges per million tokens, and go straight to the cheapest
-            one.
+          <p className="eyebrow">AI inference price index</p>
+          <h1>Compare AI model prices</h1>
+          <p className="hero__lead">
+            Published prices from discount inference providers, normalised to US dollars per million
+            tokens.
           </p>
 
           <div className="search">
@@ -79,7 +79,7 @@ export function PriceExplorer({
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search a model — opus 5, sonnet, gpt 5.6, gemini…"
+              placeholder="Search Claude, GPT, Gemini, DeepSeek…"
               autoComplete="off"
               spellCheck={false}
               enterKeyHint="search"
@@ -96,6 +96,19 @@ export function PriceExplorer({
             ) : null}
           </div>
 
+          {/* The dataset's vital signs, sized as metadata under the control they
+              describe rather than promoted into a separate stat band. */}
+          <p className="readout">
+            <b>{models.length}</b> models
+            <span className="readout__sep">·</span>
+            <b>{totalOffers}</b> published prices
+            <span className="readout__sep">·</span>
+            <b>
+              {providersWithPrices}/{providerCount}
+            </b>{' '}
+            providers reporting
+          </p>
+
           <p className="hint">
             Try{' '}
             {EXAMPLE_QUERIES.map((example, index) => (
@@ -107,20 +120,6 @@ export function PriceExplorer({
               </span>
             ))}
           </p>
-        </div>
-      </div>
-
-      <div className="stats">
-        <div className="shell stats__inner">
-          <span>
-            <b>{models.length}</b> models
-          </span>
-          <span>
-            <b>{totalOffers}</b> published prices
-          </span>
-          <span>
-            <b>{providersWithPrices}</b> of {providerCount} providers reporting
-          </span>
         </div>
       </div>
 
@@ -144,7 +143,11 @@ export function PriceExplorer({
               </button>
             </div>
           ) : (
-            visible.map((model) => <ModelCard key={model.id} model={model} providers={providers} now={now} />)
+            <div className="index">
+              {visible.map((model) => (
+                <ModelCard key={model.id} model={model} providers={providers} now={now} />
+              ))}
+            </div>
           )}
 
           {hidden > 0 && !searching ? (

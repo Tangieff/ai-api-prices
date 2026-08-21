@@ -3,7 +3,13 @@ import type { ModelView, ProviderRef } from '@/lib/view';
 import { OfferRow } from './OfferRow';
 import { pluralise } from './format';
 
-/** One model and every provider selling it, cheapest first. */
+/**
+ * One model and every provider selling it, cheapest first.
+ *
+ * Rendered as a band inside the shared index slab rather than as its own card:
+ * the model name and its floor price carry the hierarchy, and a hairline — not
+ * a gap and a border — separates one model from the next.
+ */
 export function ModelCard({
   model,
   providers,
@@ -19,11 +25,11 @@ export function ModelCard({
         <h3 className="model__name" id={`model-${model.id}`}>
           {model.display_name}
         </h3>
-        {model.maker ? <span className="chip">{model.maker}</span> : null}
-        <span className="chip">{pluralise(model.provider_count, 'provider')}</span>
+        {model.maker ? <span className="model__meta">{model.maker}</span> : null}
+        <span className="model__meta">{pluralise(model.provider_count, 'provider')}</span>
         <p className="model__summary">
-          from <b>{formatUsd(model.best_input_usd_per_1m)}</b> in /{' '}
-          <b>{formatUsd(model.best_output_usd_per_1m)}</b> out per 1M tokens
+          from <b>{formatUsd(model.best_input_usd_per_1m)}</b> in ·{' '}
+          <b>{formatUsd(model.best_output_usd_per_1m)}</b> out / 1M
         </p>
       </header>
 
