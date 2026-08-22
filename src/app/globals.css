@@ -12,8 +12,9 @@
  *     always means the same thing.
  *  2. Hierarchy comes from type, spacing, alignment and tonal surfaces —
  *     never from shadows, gradients, glow or glass.
- *  3. Figures are monospaced and tabular, so a column of prices reads as a
- *     column and the eye can compare down it without re-anchoring.
+ *  3. Figures are tabular, so a column of prices reads as a column and the eye
+ *     can compare down it without re-anchoring. One typeface does this — the
+ *     interface face carries the numbers too.
  *
  * Model groups stack into one continuous slab rather than sitting as separate
  * floating cards: the page should read as a single index, not a dashboard.
@@ -133,11 +134,11 @@ a {
   padding: 0 var(--s6);
 }
 
-/* Figures: one treatment everywhere a number appears. */
+/* Figures: one treatment everywhere a number appears. Tabular numerals are what
+   hold the price columns in line now that the figures are set in the interface
+   face rather than a monospace one. */
 .num {
-  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-feature-settings: 'zero' 1;
   white-space: nowrap;
 }
 
@@ -178,7 +179,6 @@ a {
 }
 
 .wordmark__product {
-  font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.17em;
@@ -205,7 +205,6 @@ a {
 
 .eyebrow {
   margin: 0 0 var(--s3);
-  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.17em;
@@ -288,7 +287,6 @@ a {
 /* The dataset's own vital signs, sized as metadata rather than as a stat band. */
 .readout {
   margin: var(--s4) 0 0;
-  font-family: var(--font-mono);
   font-size: 12.5px;
   font-variant-numeric: tabular-nums;
   color: var(--ink-faint);
@@ -373,7 +371,6 @@ a {
 }
 
 .model__meta {
-  font-family: var(--font-mono);
   font-size: 11.5px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -382,7 +379,6 @@ a {
 
 .model__summary {
   margin: 0 0 0 auto;
-  font-family: var(--font-mono);
   font-size: 12.5px;
   font-variant-numeric: tabular-nums;
   color: var(--ink-faint);
@@ -404,7 +400,6 @@ a {
 
 .offers th {
   text-align: right;
-  font-family: var(--font-mono);
   font-size: 10.5px;
   font-weight: 500;
   letter-spacing: 0.11em;
@@ -479,7 +474,6 @@ a {
 }
 
 .badge-best {
-  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.09em;
@@ -492,7 +486,6 @@ a {
 
 .badge-save {
   display: inline-block;
-  font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -505,7 +498,6 @@ a {
 
 .tag-tier,
 .tag-seed {
-  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -517,7 +509,6 @@ a {
 }
 
 .tag-stale {
-  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -644,7 +635,6 @@ a {
   margin: 0 0 var(--s3);
   padding-bottom: var(--s2);
   border-bottom: 1px solid var(--rule);
-  font-family: var(--font-mono);
   font-size: 10.5px;
   font-weight: 500;
   letter-spacing: 0.13em;
@@ -701,7 +691,6 @@ a {
 
 .source-list__count {
   margin-left: auto;
-  font-family: var(--font-mono);
   font-size: 11.5px;
   color: var(--ink-faint);
   font-variant-numeric: tabular-nums;
@@ -711,7 +700,6 @@ a {
   margin-top: var(--s6);
   padding-top: var(--s4);
   border-top: 1px solid var(--rule);
-  font-family: var(--font-mono);
   font-size: 11.5px;
   letter-spacing: 0.02em;
   color: var(--ink-faint);
@@ -793,7 +781,6 @@ a {
 
   .offers td::before {
     content: attr(data-label);
-    font-family: var(--font-mono);
     font-size: 10.5px;
     font-weight: 500;
     letter-spacing: 0.09em;
