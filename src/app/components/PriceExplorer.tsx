@@ -1,8 +1,9 @@
 'use client';
 
 import { useDeferredValue, useId, useMemo, useState } from 'react';
-import type { ModelView, ProviderRef } from '@/lib/view';
+import { pickFeaturedModels } from '@/lib/featured-models';
 import { matches } from '@/lib/search';
+import type { ModelView, ProviderRef } from '@/lib/view';
 import { ModelCard } from './ModelCard';
 import { pluralise } from './format';
 import { useClock } from './useClock';
@@ -14,15 +15,13 @@ import { useClock } from './useClock';
  * precomputed search blob per model, so this component only filters an array —
  * no fetching, no state library, no debounce beyond React's own deferred value.
  *
- * Only a slice is rendered at a time. A few hundred models times a handful of
- * offers is a lot of table rows, and nobody scrolls past the first screen
- * without searching.
+ * The homepage is intentionally curated: without a query it shows only the
+ * current priority models. The full provider catalogue stays searchable.
  */
 
-const INITIAL_VISIBLE = 25;
 const SEARCH_VISIBLE = 60;
 
-const EXAMPLE_QUERIES = ['opus 5', 'sonnet', 'gpt 5.6', 'haiku', 'gemini'];
+const EXAMPLE_QUERIES = ['fable 5', 'gpt 5.6 sol', 'opus 5', 'sonnet 5', 'glm 5.2', 'grok 4.6'];
 
 interface PriceExplorerProps {
   models: ModelView[];
@@ -40,24 +39,23 @@ export function PriceExplorer({
   providersWithPrices,
 }: PriceExplorerProps) {
   const [query, setQuery] = useState('');
-  const [showAll, setShowAll] = useState(false);
   const deferredQuery = useDeferredValue(query);
   const inputId = useId();
 
   // Null until mounted, so the server and client render the same markup; see
   // `useClock`. Offer rows fall back to an absolute date until it arrives.
   const now = useClock();
+  const featured = useMemo(() => pickFeaturedModels(models), [models]);
 
   const filtered = useMemo(() => {
     const trimmed = deferredQuery.trim();
-    if (!trimmed) return models;
+    if (!trimmed) return featured;
     return models.filter((model) => matches(model.search_text, trimmed));
-  }, [models, deferredQuery]);
+  }, [models, featured, deferredQuery]);
 
   const searching = deferredQuery.trim().length > 0;
-  const limit = searching ? SEARCH_VISIBLE : showAll ? models.length : INITIAL_VISIBLE;
-  const visible = filtered.slice(0, limit);
-  const hidden = filtered.length - visible.length;
+  const visible = searching ? filtered.slice(0, SEARCH_VISIBLE) : filtered;
+  const hidden = searching ? filtered.length - visible.length : 0;
 
   return (
     <>
@@ -99,7 +97,7 @@ export function PriceExplorer({
           {/* The dataset's vital signs, sized as metadata under the control they
               describe rather than promoted into a separate stat band. */}
           <p className="readout">
-            <b>{models.length}</b> models
+            <b>{models.length}</b> models searchable
             <span className="readout__sep">·</span>
             <b>{totalOffers}</b> published prices
             <span className="readout__sep">·</span>
@@ -128,7 +126,7 @@ export function PriceExplorer({
           <p className="results__meta" role="status">
             {searching
               ? `${pluralise(filtered.length, 'model')} matching “${deferredQuery.trim()}”`
-              : `Showing ${visible.length} of ${pluralise(models.length, 'model')}, most widely compared first`}
+              : `${pluralise(visible.length, 'featured model')} · search all ${pluralise(models.length, 'model')}`}
           </p>
 
           {visible.length === 0 ? (
@@ -139,7 +137,7 @@ export function PriceExplorer({
                 shorter query such as “opus” or “gpt”.
               </p>
               <button type="button" className="button-quiet" onClick={() => setQuery('')}>
-                Show all models
+                Back to featured models
               </button>
             </div>
           ) : (
@@ -150,13 +148,7 @@ export function PriceExplorer({
             </div>
           )}
 
-          {hidden > 0 && !searching ? (
-            <button type="button" className="button-quiet more" onClick={() => setShowAll(true)}>
-              Show all {models.length} models
-            </button>
-          ) : null}
-
-          {hidden > 0 && searching ? (
+          {hidden > 0 ? (
             <p className="results__meta">
               {hidden} more {hidden === 1 ? 'match is' : 'matches are'} hidden — narrow the search to
               see them.
