@@ -65,5 +65,8 @@ CMD ["node", "server.js"]
 FROM deps AS refresh
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
-COPY . .
+COPY --chown=node:node . .
+# The job only needs to read the checkout and write data/prices.json, so it runs
+# with the same unprivileged application user.
+USER node
 CMD ["npm", "run", "refresh-prices"]
