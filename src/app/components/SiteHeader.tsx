@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { SITE } from '@/lib/site';
 
 /**
  * Masthead.
@@ -19,9 +18,6 @@ export function SiteHeader() {
           </span>
           <span className="wordmark__product">PRICES</span>
         </Link>
-        <a className="header-link" href={SITE.oxwebUrl} rel="noopener noreferrer">
-          OXWeb ecosystem →
-        </a>
       </div>
     </header>
   );
