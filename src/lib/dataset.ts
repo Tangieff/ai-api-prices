@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { Dataset } from './types';
 
@@ -48,7 +48,27 @@ export async function loadDataset(): Promise<Dataset> {
   }
 }
 
-export async function saveDataset(dataset: Dataset): Promise<void> {
-  await mkdir(path.dirname(DATASET_PATH), { recursive: true });
-  await writeFile(DATASET_PATH, `${JSON.stringify(dataset, null, 2)}\n`, 'utf8');
+/**
+ * Replace the dataset atomically.
+ *
+ * A periodic refresh can race with a Next.js revalidation read. Writing the
+ * final path directly creates a small window where a reader could see partial
+ * JSON. Write a sibling temporary file first, then rename it over the live file
+ * so readers observe either the old complete snapshot or the new complete one.
+ */
+export async function saveDataset(dataset: Dataset, datasetPath = DATASET_PATH): Promise<void> {
+  const directory = path.dirname(datasetPath);
+  const temporaryPath = path.join(
+    directory,
+    `.${path.basename(datasetPath)}.${process.pid}.${Date.now()}.tmp`,
+  );
+
+  await mkdir(directory, { recursive: true });
+  try {
+    await writeFile(temporaryPath, `${JSON.stringify(dataset, null, 2)}\n`, 'utf8');
+    await rename(temporaryPath, datasetPath);
+  } finally {
+    // No-op after a successful rename; cleans up if the write/rename path fails.
+    await rm(temporaryPath, { force: true }).catch(() => {});
+  }
 }
