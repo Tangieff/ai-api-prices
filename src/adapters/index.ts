@@ -4,10 +4,12 @@ import { derouterAdapter } from './derouter';
 import { clawhiveAdapter } from './clawhive';
 import { worldgateAdapter } from './worldgate';
 import { getgoapiAdapter } from './getgoapi';
+import { boundlessAdapter } from './boundless';
+import { llmsrelayAdapter } from './llmsrelay';
 
 /**
- * Every adapter in the launch set. Adding provider #6 means writing one file and
- * appending it here plus an entry in `lib/providers.ts` — nothing else.
+ * Every provider adapter in the refresh set. New providers stay isolated in one
+ * file and are registered here plus `lib/providers.ts`.
  */
 export const ADAPTERS: Adapter[] = [
   surplusIntelligenceAdapter,
@@ -15,6 +17,8 @@ export const ADAPTERS: Adapter[] = [
   clawhiveAdapter,
   worldgateAdapter,
   getgoapiAdapter,
+  boundlessAdapter,
+  llmsrelayAdapter,
 ];
 
 export type { Adapter, RawOffer } from './types';

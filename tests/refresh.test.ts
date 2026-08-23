@@ -219,10 +219,10 @@ describe('buildPageData', () => {
     expect(data.models[0]!.provider_count).toBe(2);
   });
 
-  it('resolves Visit to the provider site while affiliate_url is unset', async () => {
+  it('resolves Visit through the configured provider destination', async () => {
     const data = await pageData();
     const offer = data.models[0]!.offers[0]!;
-    expect(data.providers[offer.provider_id]!.visit_url).toBe('https://derouter.ai/');
+    expect(data.providers[offer.provider_id]!.visit_url).toBe('https://derouter.ai?ref=mZxRdS1y');
   });
 
   it('publishes a provider entry for every offer row', async () => {
