@@ -1,0 +1,37 @@
+{
+  "success": true,
+  "data": [
+    {
+      "model_name": "claude-opus-4-6",
+      "quota_type": 0,
+      "model_ratio": 2.5,
+      "completion_ratio": 5,
+      "cache_ratio": 0.1,
+      "create_cache_ratio": 1.25,
+      "enable_groups": ["default"],
+      "group_ratio": {"default": 0.036},
+      "supported_endpoint_types": ["anthropic", "openai"]
+    },
+    {
+      "model_name": "gpt-5.4",
+      "quota_type": 0,
+      "model_ratio": 1.25,
+      "completion_ratio": 6,
+      "cache_ratio": 0.1,
+      "enable_groups": ["default"],
+      "group_ratio": {"default": 0.02},
+      "supported_endpoint_types": ["openai"],
+      "billing_mode": "tiered_expr",
+      "billing_expr": "len <= 272000 ? tier(\"short_context\", p * 2.5 + c * 15 + cr * 0.25) : tier(\"long_context\", p * 5 + c * 22.5 + cr * 0.5)"
+    },
+    {
+      "model_name": "gpt-image-2",
+      "quota_type": 0,
+      "model_ratio": 1,
+      "completion_ratio": 4,
+      "enable_groups": ["default"],
+      "group_ratio": {"default": 0.02},
+      "supported_endpoint_types": ["openai"]
+    }
+  ]
+}

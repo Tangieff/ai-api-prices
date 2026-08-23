@@ -1,0 +1,37 @@
+{
+  "object": "list",
+  "scope": "public",
+  "currency": "USD",
+  "pricing_unit": "per_1m_tokens",
+  "count": 4,
+  "data": [
+    {
+      "id": "claude-opus-5",
+      "display_name": "Claude Opus 5",
+      "category": "text",
+      "available": true,
+      "pricing": {"currency": "USD", "unit": "per_1m_tokens", "input": 0.59, "output": 2.93, "cache_read": 0.06}
+    },
+    {
+      "id": "gpt-5.6-sol",
+      "display_name": "GPT-5.6 Sol",
+      "category": "text",
+      "available": true,
+      "pricing": {"currency": "USD", "unit": "per_1m_tokens", "input": 0.39, "output": 2.34}
+    },
+    {
+      "id": "gpt-image-2",
+      "display_name": "GPT Image 2",
+      "category": "image",
+      "available": true,
+      "pricing": {"currency": "USD", "unit": "per_1m_tokens", "input": 1, "output": 5}
+    },
+    {
+      "id": "kimi-k3",
+      "display_name": "Kimi K3",
+      "category": "text",
+      "available": true,
+      "pricing": {"currency": "USD", "unit": "per_1m_tokens", "input": 0, "output": 0}
+    }
+  ]
+}

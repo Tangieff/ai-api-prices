@@ -76,6 +76,7 @@ function normalise(raw: RawOffer, providerId: string, observedAt: string): Offer
 
   const canonical = canonicalModelId(raw.display_name ?? raw.provider_model_id);
   if (!canonical.id) return null;
+  const tierParts = [...new Set([raw.tier, canonical.tier].filter((part): part is string => Boolean(part)))];
 
   const offer: Offer = {
     provider_id: providerId,
@@ -90,9 +91,10 @@ function normalise(raw: RawOffer, providerId: string, observedAt: string): Offer
     observed_at: observedAt,
     source_url: raw.source_url ?? provider.pricing_source_url,
     provider_model_id: raw.provider_model_id,
-    // An explicit tier from the adapter wins; otherwise use the reasoning-effort
-    // variant folded out of the model id.
-    tier: raw.tier ?? canonical.tier,
+    // Route and model variants are independent dimensions. Preserve both: an
+    // OpenRouter route must not hide a differently priced `thinking`/`high`
+    // variant extracted from the provider's model id.
+    tier: tierParts.length > 0 ? tierParts.join(' · ') : null,
   };
   offer.discount_pct = offerDiscountPct(offer);
   return offer;

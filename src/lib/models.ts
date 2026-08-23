@@ -18,7 +18,18 @@ import type { Model } from './types';
 
 /** Vendor namespaces some catalogues prefix onto the model id. */
 const VENDOR_PREFIXES = [
+  'aion-labs',
+  'allenai',
+  'amazon',
+  'anthracite-org',
   'anthropic',
+  'arcee-ai',
+  'baidu',
+  'bytedance',
+  'bytedance-seed',
+  'cognitivecomputations',
+  'cohere',
+  'deepseek',
   'openai',
   'google',
   'x-ai',
@@ -26,9 +37,40 @@ const VENDOR_PREFIXES = [
   'meta-llama',
   'meta',
   'mistralai',
+  'mistral',
   'deepseek-ai',
+  'gryphe',
+  'ibm-granite',
+  'inception',
+  'inclusionai',
+  'kwaipilot',
+  'mancer',
+  'meituan',
+  'microsoft',
+  'minimax',
+  'moonshot',
   'qwen',
   'moonshotai',
+  'morph',
+  'nex-agi',
+  'nousresearch',
+  'nvidia',
+  'perceptron',
+  'perplexity',
+  'poolside',
+  'rekaai',
+  'relace',
+  'sakana',
+  'sao10k',
+  'stepfun',
+  'tencent',
+  'thedrummer',
+  'thinkingmachines',
+  'undi95',
+  'upstage',
+  'writer',
+  'xiaomi',
+  'zhipu',
   'z-ai',
 ];
 
@@ -202,6 +244,15 @@ const MAKER_PATTERNS: [RegExp, string, string][] = [
   [/^mistral|^magistral|^devstral|^codestral/, 'Mistral', 'Mistral'],
   [/^glm/, 'Z.ai', 'GLM'],
   [/^kimi/, 'Moonshot', 'Kimi'],
+  [/^minimax/, 'MiniMax', 'MiniMax'],
+  [/^nemotron/, 'NVIDIA', 'Nemotron'],
+  [/^nova/, 'Amazon', 'Nova'],
+  [/^command/, 'Cohere', 'Command'],
+  [/^phi/, 'Microsoft', 'Phi'],
+  [/^ernie/, 'Baidu', 'ERNIE'],
+  [/^olmo/, 'AllenAI', 'OLMo'],
+  [/^mimo/, 'Xiaomi', 'MiMo'],
+  [/^hunyuan|^hy-/, 'Tencent', 'Hunyuan'],
 ];
 
 /** Turn a slug into a readable name: "claude-opus-4.5" -> "Claude Opus 4.5". */
@@ -222,6 +273,8 @@ function titleiseSlug(slug: string): string {
     .replace(/\bMinimax\b/g, 'MiniMax')
     .replace(/\bAi\b/g, 'AI')
     .replace(/\bLlm\b/g, 'LLM')
+    .replace(/\bOlmo\b/g, 'OLMo')
+    .replace(/\bErnie\b/g, 'ERNIE')
     // OpenAI hyphenates the model number onto the family ("GPT-5.6 Sol",
     // "GPT-4o"), unlike every other vendor. Without this the curated
     // "GPT-5.6 Sol" and the derived "GPT 5.6 Sol Pro" would sit side by side.

@@ -41,16 +41,23 @@ export function parsePricing(payload: unknown): RawOffer[] {
     const output = positive(value.output);
     if (input === null || output === null) continue;
 
+    // OpenRouter-style `:batch` is a priced route, not part of model identity.
+    // Keep the provider id verbatim for provenance while using a clean display
+    // id and an explicit tier so it cannot collide with the on-demand route.
+    const batch = value.model.endsWith(':batch');
+    const displayModel = batch ? value.model.slice(0, -':batch'.length) : value.model;
+
     const route = [value.provider, value.source]
       .filter((part): part is string => typeof part === 'string' && part.trim().length > 0)
       .join(' / ');
     offers.push({
       provider_model_id: value.model,
+      display_name: displayModel,
       input_usd_per_1m: input,
       output_usd_per_1m: output,
       reference_input_usd_per_1m: positive(value.original_input),
       reference_output_usd_per_1m: positive(value.original_output),
-      tier: route || null,
+      tier: [route, batch ? 'batch' : ''].filter(Boolean).join(' · ') || null,
       source_url: PRICING_URL,
     });
   }

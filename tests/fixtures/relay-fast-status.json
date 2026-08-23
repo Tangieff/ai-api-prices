@@ -1,0 +1,8 @@
+{
+  "data": {
+    "quota_display_type": "USD",
+    "quota_per_unit": 500000,
+    "price": 1,
+    "custom_currency_exchange_rate": 1
+  }
+}

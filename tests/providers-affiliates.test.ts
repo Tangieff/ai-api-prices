@@ -26,7 +26,7 @@ describe('provider affiliate destinations', () => {
   });
 
   it('routes integrated providers through a referral when one is registered', () => {
-    expect(PROVIDERS_BY_ID.size).toBe(13);
+    expect(PROVIDERS_BY_ID.size).toBe(18);
     for (const provider of PROVIDERS_BY_ID.values()) {
       const expected = EXPECTED_REFERRALS[provider.id as keyof typeof EXPECTED_REFERRALS];
       expect(provider.affiliate_url).toBe(expected ?? null);

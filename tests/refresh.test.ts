@@ -272,6 +272,22 @@ describe('refresh', () => {
     expect(dataset.offers).toHaveLength(2);
     expect(dataset.offers.map((o) => o.tier).sort()).toEqual([null, 'thinking']);
   });
+
+  it('combines an adapter route tier with a model reasoning tier', async () => {
+    const adapter = stubAdapter('derouter', [
+      {
+        provider_model_id: 'gpt-5.6-sol-thinking',
+        input_usd_per_1m: 1,
+        output_usd_per_1m: 2,
+        tier: 'OpenRouter',
+      },
+    ]);
+    const { dataset } = await refresh({ adapters: [adapter], now: at('2026-08-20T12:00:00.000Z') });
+    expect(dataset.offers[0]).toMatchObject({
+      model_id: 'gpt-5.6-sol',
+      tier: 'OpenRouter · thinking',
+    });
+  });
 });
 
 describe('buildPageData', () => {

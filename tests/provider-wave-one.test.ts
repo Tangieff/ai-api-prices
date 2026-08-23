@@ -72,6 +72,25 @@ describe('AITransX adapter', () => {
       }),
     ]);
   });
+
+  it('keeps OpenRouter batch pricing as a tier instead of a second canonical model', () => {
+    const offers = parseAITransXPricing({
+      data: [
+        {
+          model: 'deepseek/deepseek-v4-pro:batch',
+          provider: 'DeepSeek',
+          source: 'openrouter',
+          input: 0.2,
+          output: 0.8,
+        },
+      ],
+    });
+    expect(offers[0]).toMatchObject({
+      provider_model_id: 'deepseek/deepseek-v4-pro:batch',
+      display_name: 'deepseek/deepseek-v4-pro',
+      tier: 'DeepSeek / openrouter · batch',
+    });
+  });
 });
 
 describe('TokenMix adapter', () => {

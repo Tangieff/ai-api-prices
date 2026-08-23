@@ -12,6 +12,11 @@ import { relayrouterAdapter } from './relayrouter';
 import { aitransxAdapter } from './aitransx';
 import { tokenmixAdapter } from './tokenmix';
 import { relaygpuAdapter } from './relaygpu';
+import { relayAiAdapter } from './relay-ai';
+import { llmrelayDevAdapter } from './llmrelay-dev';
+import { midrelayAdapter } from './midrelay';
+import { zrelayAdapter } from './zrelay';
+import { relayFastAdapter } from './relay-fast';
 
 /**
  * Every provider adapter in the refresh set. New providers stay isolated in one
@@ -31,6 +36,11 @@ export const ADAPTERS: Adapter[] = [
   aitransxAdapter,
   tokenmixAdapter,
   relaygpuAdapter,
+  relayAiAdapter,
+  llmrelayDevAdapter,
+  midrelayAdapter,
+  zrelayAdapter,
+  relayFastAdapter,
 ];
 
 export type { Adapter, RawOffer } from './types';

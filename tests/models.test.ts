@@ -21,6 +21,13 @@ describe('canonicalModelId', () => {
     expect(canonicalModelId('gpt-5.4-mini-2026-03-17').id).toBe('gpt-5.4-mini');
   });
 
+  it('strips vendor namespaces observed in the Wave 1 catalogues', () => {
+    expect(canonicalModelId('deepseek/deepseek-v4-pro').id).toBe('deepseek-v4-pro');
+    expect(canonicalModelId('cohere/command-a').id).toBe('command-a');
+    expect(canonicalModelId('amazon/nova-lite-v1').id).toBe('nova-lite-v1');
+    expect(canonicalModelId('aion-labs/aion-3.0').id).toBe('aion-3.0');
+  });
+
   it('keeps genuinely different models apart', () => {
     expect(canonicalModelId('claude-opus-4.5').id).not.toBe(canonicalModelId('claude-opus-4.6').id);
     // "-fast" is a separately priced routing variant, not a rendering of the base model.
@@ -72,6 +79,10 @@ describe('describeModel', () => {
   it('infers a maker for models that are not curated', () => {
     expect(describeModel('claude-opus-9.9').maker).toBe('Anthropic');
     expect(describeModel('gemini-9-ultra').maker).toBe('Google');
+    expect(describeModel('nemotron-3-super-120b').maker).toBe('NVIDIA');
+    expect(describeModel('nova-lite-v1').maker).toBe('Amazon');
+    expect(describeModel('command-a').maker).toBe('Cohere');
+    expect(describeModel('minimax-m3').maker).toBe('MiniMax');
     expect(describeModel('some-unknown-model').maker).toBeNull();
   });
 
