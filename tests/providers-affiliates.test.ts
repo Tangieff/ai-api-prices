@@ -25,16 +25,17 @@ describe('provider affiliate destinations', () => {
     }
   });
 
-  it('routes every currently integrated provider through its supplied referral URL', () => {
-    expect(PROVIDERS_BY_ID.size).toBe(7);
+  it('routes integrated providers through a referral when one is registered', () => {
+    expect(PROVIDERS_BY_ID.size).toBe(13);
     for (const provider of PROVIDERS_BY_ID.values()) {
-      expect(provider.affiliate_url).toBe(EXPECTED_REFERRALS[provider.id as keyof typeof EXPECTED_REFERRALS]);
-      expect(visitUrl(provider)).toBe(provider.affiliate_url);
+      const expected = EXPECTED_REFERRALS[provider.id as keyof typeof EXPECTED_REFERRALS];
+      expect(provider.affiliate_url).toBe(expected ?? null);
+      expect(visitUrl(provider)).toBe(expected ?? provider.website_url);
     }
   });
 
   it('keeps future-provider referrals without activating those providers prematurely', () => {
-    for (const id of ['neokens', 'cometapi', 'claudexia', 'packyapi', 'omniakey']) {
+    for (const id of ['neokens', 'claudexia', 'packyapi']) {
       expect(referralUrl(id)).not.toBeNull();
       expect(PROVIDERS_BY_ID.has(id)).toBe(false);
     }

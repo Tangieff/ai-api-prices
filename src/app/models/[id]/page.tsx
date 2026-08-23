@@ -83,13 +83,10 @@ export default async function ModelPage({ params }: ModelPageProps) {
             <div className="index">
               <ModelCard model={model} providers={data.providers} now={null} />
             </div>
-            <p className={styles.note}>
-              Provider links may be referral links. Referral status never affects price ranking.
-            </p>
           </div>
         </div>
       </main>
-      <SiteFooter providerStatus={data.provider_status} generatedAt={data.generated_at} />
+      <SiteFooter generatedAt={data.generated_at} />
     </>
   );
 }

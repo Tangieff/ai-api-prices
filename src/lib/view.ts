@@ -103,22 +103,35 @@ export function buildPageData(dataset: Dataset): PageData {
 
   const models: ModelView[] = [];
   for (const model of dataset.models) {
-    const sorted = [...(offersByModel.get(model.id) ?? [])].sort(compareOffers);
+    const sorted = [...(offersByModel.get(model.id) ?? [])].sort((a, b) => {
+      const staleOrder =
+        Number(staleProviders.has(a.provider_id)) - Number(staleProviders.has(b.provider_id));
+      return staleOrder || compareOffers(a, b);
+    });
     if (sorted.length === 0) continue;
 
     // "Best" means cheapest on the documented cost score. An offer missing a
     // price is not comparable, so it can never be the best even if it sorts
     // first in an all-incomplete group.
-    const cheapest = sorted.find((offer) => costScoreMicros(offer) !== null);
+    const cheapest = sorted.find(
+      (offer) => !staleProviders.has(offer.provider_id) && costScoreMicros(offer) !== null,
+    );
 
     const offers = sorted
       .map((offer) => toOfferView(offer, offer === cheapest, staleProviders.has(offer.provider_id)))
       .filter((offer): offer is OfferView => offer !== null);
     if (offers.length === 0) continue;
 
-    const prices = offers.map((offer) => offer.input_usd_per_1m).filter((p): p is number => p !== null);
-    const outputs = offers.map((offer) => offer.output_usd_per_1m).filter((p): p is number => p !== null);
-    const discounts = offers.map((offer) => offer.discount_pct).filter((d): d is number => d !== null);
+    const freshOffers = offers.filter((offer) => !offer.stale);
+    const prices = freshOffers
+      .map((offer) => offer.input_usd_per_1m)
+      .filter((p): p is number => p !== null);
+    const outputs = freshOffers
+      .map((offer) => offer.output_usd_per_1m)
+      .filter((p): p is number => p !== null);
+    const discounts = freshOffers
+      .map((offer) => offer.discount_pct)
+      .filter((d): d is number => d !== null);
 
     models.push({
       id: model.id,

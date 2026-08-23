@@ -1,0 +1,11 @@
+{
+  "object": "pricing.list",
+  "currency": "USD",
+  "unit": "1M_tokens",
+  "data": [
+    {"model":"openai/gpt-5.6-sol","provider":"relay","source":"relay","input":1,"output":6,"original_input":5,"original_output":30},
+    {"model":"openai/gpt-image-1","provider":"OpenAI","source":"openrouter","input":10,"output":10,"request":0.04},
+    {"model":"openai/text-embedding-3-small","provider":"OpenAI","source":"openrouter","input":0.02,"output":0},
+    {"model":"bad-zero","provider":"auto","source":"auto","input":0,"output":0}
+  ]
+}

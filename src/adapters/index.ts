@@ -6,6 +6,12 @@ import { getgoapiAdapter } from './getgoapi';
 import { boundlessAdapter } from './boundless';
 import { llmsrelayAdapter } from './llmsrelay';
 import { frugalRelayAdapter } from './frugal-relay';
+import { cometapiAdapter } from './cometapi';
+import { omniakeyAdapter } from './omniakey';
+import { relayrouterAdapter } from './relayrouter';
+import { aitransxAdapter } from './aitransx';
+import { tokenmixAdapter } from './tokenmix';
+import { relaygpuAdapter } from './relaygpu';
 
 /**
  * Every provider adapter in the refresh set. New providers stay isolated in one
@@ -19,6 +25,12 @@ export const ADAPTERS: Adapter[] = [
   boundlessAdapter,
   llmsrelayAdapter,
   frugalRelayAdapter,
+  cometapiAdapter,
+  omniakeyAdapter,
+  relayrouterAdapter,
+  aitransxAdapter,
+  tokenmixAdapter,
+  relaygpuAdapter,
 ];
 
 export type { Adapter, RawOffer } from './types';

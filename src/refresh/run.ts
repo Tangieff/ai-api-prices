@@ -1,6 +1,7 @@
 import { ADAPTERS } from '@/adapters';
 import type { Adapter, RawOffer } from '@/adapters';
 import { canonicalModelId, describeModel } from '@/lib/models';
+import { effectiveUsdPer1m } from '@/lib/effective-cost';
 import { offerDiscountPct } from '@/lib/money';
 import { PROVIDERS, PROVIDERS_BY_ID } from '@/lib/providers';
 import { compareOffers } from '@/lib/score';
@@ -12,9 +13,8 @@ import type { Dataset, Model, Offer, ProviderStatus } from '@/lib/types';
  *
  * Adapters run concurrently and in isolation. A provider that times out, 500s
  * or changes its page layout produces a recorded error and keeps whatever
- * offers the previous run captured — it never blanks the other four providers
- * and never aborts the run. That is the whole reliability model: no retries, no
- * queue, no partial-write window.
+ * offers the previous run captured. A failed source gets two bounded retries;
+ * there is still no queue and no partial-write window.
  */
 
 export interface RefreshResult {
@@ -24,30 +24,49 @@ export interface RefreshResult {
 
 /** Per-adapter timeout guard. `fetchText`/`fetchJson` also time out; this covers seeds and parsing. */
 const ADAPTER_TIMEOUT_MS = 45_000;
+const RETRY_BACKOFF_MS = [250, 750] as const;
 
 type AdapterOutcome =
   | { ok: true; provider_id: string; offers: RawOffer[] }
   | { ok: false; provider_id: string; error: string };
 
-async function runAdapter(adapter: Adapter): Promise<AdapterOutcome> {
+async function attemptAdapter(adapter: Adapter): Promise<RawOffer[]> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    const offers = await Promise.race([
+    return await Promise.race([
       adapter.fetchOffers(),
-      new Promise<never>((_, reject) =>
-        setTimeout(
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
           () => reject(new Error(`adapter exceeded ${ADAPTER_TIMEOUT_MS}ms`)),
           ADAPTER_TIMEOUT_MS,
-        ).unref?.(),
-      ),
+        );
+        timer.unref?.();
+      }),
     ]);
-    return { ok: true, provider_id: adapter.provider_id, offers };
-  } catch (error) {
-    return {
-      ok: false,
-      provider_id: adapter.provider_id,
-      error: error instanceof Error ? error.message : String(error),
-    };
+  } finally {
+    if (timer) clearTimeout(timer);
   }
+}
+
+async function runAdapter(
+  adapter: Adapter,
+  sleep: (milliseconds: number) => Promise<void>,
+): Promise<AdapterOutcome> {
+  let lastError = 'unknown adapter error';
+  for (let attempt = 0; attempt <= RETRY_BACKOFF_MS.length; attempt += 1) {
+    try {
+      return { ok: true, provider_id: adapter.provider_id, offers: await attemptAdapter(adapter) };
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+      const delay = RETRY_BACKOFF_MS[attempt];
+      if (delay !== undefined) await sleep(delay);
+    }
+  }
+  return {
+    ok: false,
+    provider_id: adapter.provider_id,
+    error: `failed after ${RETRY_BACKOFF_MS.length + 1} attempts: ${lastError}`,
+  };
 }
 
 /** Turn one adapter row into a stored offer: canonical model id, discount, timestamps. */
@@ -61,10 +80,10 @@ function normalise(raw: RawOffer, providerId: string, observedAt: string): Offer
   const offer: Offer = {
     provider_id: providerId,
     model_id: canonical.id,
-    input_usd_per_1m: raw.input_usd_per_1m,
-    output_usd_per_1m: raw.output_usd_per_1m,
-    cache_read_usd_per_1m: raw.cache_read_usd_per_1m ?? null,
-    cache_write_usd_per_1m: raw.cache_write_usd_per_1m ?? null,
+    input_usd_per_1m: effectiveUsdPer1m(raw.input_usd_per_1m, raw.effective_cost),
+    output_usd_per_1m: effectiveUsdPer1m(raw.output_usd_per_1m, raw.effective_cost),
+    cache_read_usd_per_1m: effectiveUsdPer1m(raw.cache_read_usd_per_1m, raw.effective_cost),
+    cache_write_usd_per_1m: effectiveUsdPer1m(raw.cache_write_usd_per_1m, raw.effective_cost),
     reference_input_usd_per_1m: raw.reference_input_usd_per_1m ?? null,
     reference_output_usd_per_1m: raw.reference_output_usd_per_1m ?? null,
     discount_pct: null,
@@ -129,6 +148,8 @@ export interface RefreshOptions {
   /** Injectable for deterministic tests. */
   now?: () => Date;
   onProgress?: (message: string) => void;
+  /** Injectable so retry tests do not wait on wall-clock backoff. */
+  sleep?: (milliseconds: number) => Promise<void>;
 }
 
 export async function refresh(options: RefreshOptions = {}): Promise<RefreshResult> {
@@ -137,8 +158,10 @@ export async function refresh(options: RefreshOptions = {}): Promise<RefreshResu
   const now = options.now ?? (() => new Date());
   const observedAt = now().toISOString();
   const log = options.onProgress ?? (() => {});
+  const sleep =
+    options.sleep ?? ((milliseconds) => new Promise<void>((resolve) => setTimeout(resolve, milliseconds)));
 
-  const outcomes = await Promise.all(adapters.map(runAdapter));
+  const outcomes = await Promise.all(adapters.map((adapter) => runAdapter(adapter, sleep)));
 
   const offers: Offer[] = [];
   const statuses: ProviderStatus[] = [];
@@ -148,23 +171,28 @@ export async function refresh(options: RefreshOptions = {}): Promise<RefreshResu
       (status) => status.provider_id === outcome.provider_id,
     );
 
+    let failureError = outcome.ok ? null : outcome.error;
     if (outcome.ok) {
-      const normalised = dedupe(
-        outcome.offers
-          .map((raw) => normalise(raw, outcome.provider_id, observedAt))
-          .filter((offer): offer is Offer => offer !== null),
-      );
-      offers.push(...normalised);
-      statuses.push({
-        provider_id: outcome.provider_id,
-        ok: true,
-        offer_count: normalised.length,
-        last_success_at: observedAt,
-        error: null,
-        stale: false,
-      });
-      log(`ok    ${outcome.provider_id}: ${normalised.length} offers`);
-      continue;
+      try {
+        const normalised = dedupe(
+          outcome.offers
+            .map((raw) => normalise(raw, outcome.provider_id, observedAt))
+            .filter((offer): offer is Offer => offer !== null),
+        );
+        offers.push(...normalised);
+        statuses.push({
+          provider_id: outcome.provider_id,
+          ok: true,
+          offer_count: normalised.length,
+          last_success_at: observedAt,
+          error: null,
+          stale: false,
+        });
+        log(`ok    ${outcome.provider_id}: ${normalised.length} offers`);
+        continue;
+      } catch (error) {
+        failureError = `normalization failed: ${error instanceof Error ? error.message : String(error)}`;
+      }
     }
 
     // Failure: keep the previous run's offers for this provider so one broken
@@ -176,11 +204,11 @@ export async function refresh(options: RefreshOptions = {}): Promise<RefreshResu
       ok: false,
       offer_count: carried.length,
       last_success_at: previousStatus?.last_success_at ?? null,
-      error: outcome.error,
+      error: failureError,
       stale: carried.length > 0,
     });
     log(
-      `FAIL  ${outcome.provider_id}: ${outcome.error}` +
+      `FAIL  ${outcome.provider_id}: ${failureError}` +
         (carried.length > 0 ? ` (kept ${carried.length} offers from the previous run)` : ''),
     );
   }

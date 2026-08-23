@@ -35,7 +35,7 @@ export default async function HomePage() {
             </div>
           </div>
         </main>
-        <SiteFooter providerStatus={data.provider_status} generatedAt={data.generated_at} />
+        <SiteFooter generatedAt={data.generated_at} />
       </>
     );
   }
@@ -54,7 +54,7 @@ export default async function HomePage() {
           }
         />
       </main>
-      <SiteFooter providerStatus={data.provider_status} generatedAt={data.generated_at} />
+      <SiteFooter generatedAt={data.generated_at} />
     </>
   );
 }

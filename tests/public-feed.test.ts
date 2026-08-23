@@ -7,7 +7,6 @@ describe('GET /api/prices.json', () => {
     const body = (await response.json()) as {
       schema_version: number;
       price_unit: string;
-      referral_disclosure: string;
       providers: Array<{ id: string; visit_url: string }>;
       models: Array<Record<string, unknown>>;
     };
@@ -16,7 +15,7 @@ describe('GET /api/prices.json', () => {
     expect(response.headers.get('cache-control')).toContain('s-maxage=300');
     expect(body.schema_version).toBe(1);
     expect(body.price_unit).toBe('USD per 1M tokens');
-    expect(body.referral_disclosure).toMatch(/never affects price ranking/i);
+    expect(body).not.toHaveProperty('referral_disclosure');
     expect(body.models.length).toBeGreaterThan(0);
     expect(body.models[0]).not.toHaveProperty('search_text');
 

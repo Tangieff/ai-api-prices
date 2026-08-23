@@ -29,8 +29,6 @@ export async function GET(): Promise<Response> {
       price_unit: 'USD per 1M tokens',
       ranking: COST_SCORE_LABEL,
       total_offers: data.total_offers,
-      referral_disclosure:
-        'Some visit_url values are referral links. Referral status never affects price ranking.',
       providers,
       models,
     },

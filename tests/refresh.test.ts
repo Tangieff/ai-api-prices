@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { refresh } from '@/refresh/run';
 import { buildPageData } from '@/lib/view';
+import { buildProviderSummaries } from '@/lib/provider-summaries';
 import type { Adapter, RawOffer } from '@/adapters';
 import type { Dataset } from '@/lib/types';
 
@@ -81,6 +82,29 @@ describe('refresh', () => {
     expect(dataset.offers[0]!.discount_pct).toBeNull();
   });
 
+  it('applies structured effective-cost factors before comparison and discount math', async () => {
+    const { dataset } = await refresh({
+      adapters: [
+        stubAdapter('worldgate', [
+          {
+            provider_model_id: 'claude-opus-5',
+            input_usd_per_1m: 5,
+            output_usd_per_1m: 25,
+            effective_cost: { credits_per_usd: { numerator: 10, denominator: 1 } },
+            reference_input_usd_per_1m: 5,
+            reference_output_usd_per_1m: 25,
+          },
+        ]),
+      ],
+      now: at('2026-08-20T12:00:00.000Z'),
+    });
+    expect(dataset.offers[0]).toMatchObject({
+      input_usd_per_1m: 0.5,
+      output_usd_per_1m: 2.5,
+      discount_pct: 90,
+    });
+  });
+
   it('stamps every offer with the observation time and a source URL', async () => {
     const { dataset } = await refresh({
       adapters: [stubAdapter('derouter', [opusFromDerouter])],
@@ -149,6 +173,68 @@ describe('refresh', () => {
     });
     expect(statuses).toHaveLength(3);
     expect(statuses.filter((s) => s.ok)).toHaveLength(1);
+  });
+
+  it('isolates invalid effective-cost normalization to its provider', async () => {
+    const { dataset } = await refresh({
+      adapters: [
+        stubAdapter('derouter', [
+          {
+            ...opusFromDerouter,
+            effective_cost: { route_multiplier: { numerator: 0, denominator: 1 } },
+          },
+        ]),
+        stubAdapter('worldgate', [opusFromWorldgate]),
+      ],
+      now: at('2026-08-20T12:00:00.000Z'),
+    });
+    expect(dataset.offers.map((offer) => offer.provider_id)).toEqual(['worldgate']);
+    expect(dataset.provider_status.find((status) => status.provider_id === 'derouter')).toMatchObject(
+      { ok: false, stale: false, error: expect.stringMatching(/normalization failed/) },
+    );
+  });
+
+  it('retries a failed adapter twice with bounded backoff before carrying data forward', async () => {
+    let attempts = 0;
+    const delays: number[] = [];
+    const adapter: Adapter = {
+      provider_id: 'worldgate',
+      source_kind: 'html',
+      fetchOffers: async () => {
+        attempts += 1;
+        throw new Error('still unavailable');
+      },
+    };
+    const { statuses } = await refresh({
+      adapters: [adapter],
+      now: at('2026-08-20T12:00:00.000Z'),
+      sleep: async (milliseconds) => {
+        delays.push(milliseconds);
+      },
+    });
+    expect(attempts).toBe(3);
+    expect(delays).toEqual([250, 750]);
+    expect(statuses[0]!.error).toMatch(/failed after 3 attempts/);
+  });
+
+  it('accepts a provider that recovers on its final retry', async () => {
+    let attempts = 0;
+    const adapter: Adapter = {
+      provider_id: 'worldgate',
+      source_kind: 'html',
+      fetchOffers: async () => {
+        attempts += 1;
+        if (attempts < 3) throw new Error('temporary outage');
+        return [opusFromWorldgate];
+      },
+    };
+    const { statuses } = await refresh({
+      adapters: [adapter],
+      now: at('2026-08-20T12:00:00.000Z'),
+      sleep: async () => {},
+    });
+    expect(attempts).toBe(3);
+    expect(statuses[0]).toMatchObject({ ok: true, stale: false, offer_count: 1 });
   });
 
   it('drops a tier row priced identically to the same provider’s base row', async () => {
@@ -248,5 +334,51 @@ describe('buildPageData', () => {
     const data = buildPageData(empty);
     expect(data.models).toEqual([]);
     expect(data.generated_at).toBeNull();
+  });
+
+  it('keeps stale offers visible but excludes them from every best-price signal', async () => {
+    const first = await refresh({
+      adapters: [stubAdapter('derouter', [opusFromDerouter])],
+      now: at('2026-08-20T12:00:00.000Z'),
+    });
+    const second = await refresh({
+      previous: first.dataset,
+      adapters: [
+        failingAdapter('derouter', 'down'),
+        stubAdapter('worldgate', [opusFromWorldgate]),
+      ],
+      now: at('2026-08-20T13:00:00.000Z'),
+      sleep: async () => {},
+    });
+    const data = buildPageData(second.dataset);
+    const model = data.models[0]!;
+    expect(model.offers).toHaveLength(2);
+    expect(model.offers[0]).toMatchObject({ provider_id: 'worldgate', stale: false, is_best: true });
+    expect(model.offers[1]).toMatchObject({ provider_id: 'derouter', stale: true, is_best: false });
+    expect(model.best_input_usd_per_1m).toBe(2.5);
+    expect(model.best_output_usd_per_1m).toBe(12.5);
+    expect(model.best_discount_pct).toBe(50);
+    const summaries = buildProviderSummaries(data.models, data.providers);
+    expect(summaries.find((provider) => provider.id === 'worldgate')?.cheapest_count).toBe(1);
+    expect(summaries.find((provider) => provider.id === 'derouter')?.cheapest_count).toBe(0);
+  });
+
+  it('shows an all-stale model without fabricating a cheapest or summary winner', async () => {
+    const first = await refresh({
+      adapters: [stubAdapter('derouter', [opusFromDerouter])],
+      now: at('2026-08-20T12:00:00.000Z'),
+    });
+    const second = await refresh({
+      previous: first.dataset,
+      adapters: [failingAdapter('derouter', 'down')],
+      now: at('2026-08-20T13:00:00.000Z'),
+      sleep: async () => {},
+    });
+    const model = buildPageData(second.dataset).models[0]!;
+    expect(model.offers).toHaveLength(1);
+    expect(model.offers[0]).toMatchObject({ stale: true, is_best: false });
+    expect(model.best_input_usd_per_1m).toBeNull();
+    expect(model.best_output_usd_per_1m).toBeNull();
+    expect(model.best_discount_pct).toBeNull();
   });
 });

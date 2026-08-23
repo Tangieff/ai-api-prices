@@ -1,3 +1,4 @@
+import type { EffectiveCostTransform } from '@/lib/effective-cost';
 import type { SourceKind } from '@/lib/types';
 
 /**
@@ -6,7 +7,7 @@ import type { SourceKind } from '@/lib/types';
  *
  * Adapters stay deliberately dumb: read the source, pull out numbers, hand back
  * raw values. Everything shared — slug folding, discount maths, timestamps —
- * happens once in the refresh pipeline so all five providers behave the same.
+ * happens once in the refresh pipeline so every provider behaves the same.
  */
 export interface RawOffer {
   /** The provider's own identifier for the model, kept verbatim for traceability. */
@@ -17,6 +18,8 @@ export interface RawOffer {
   output_usd_per_1m: number | null;
   cache_read_usd_per_1m?: number | null;
   cache_write_usd_per_1m?: number | null;
+  /** Optional exact conversion from published base rates to real-dollar rates. */
+  effective_cost?: EffectiveCostTransform;
   /** List/direct price the source itself compares against, when it publishes one. */
   reference_input_usd_per_1m?: number | null;
   reference_output_usd_per_1m?: number | null;
