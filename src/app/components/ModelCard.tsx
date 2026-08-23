@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { formatUsd } from '@/lib/money';
 import type { ModelView, ProviderRef } from '@/lib/view';
 import { OfferRow } from './OfferRow';
@@ -24,7 +25,9 @@ export function ModelCard({
     <article className="model" aria-labelledby={`model-${model.id}`}>
       <header className="model__head">
         <h3 className="model__name" id={`model-${model.id}`}>
-          {model.display_name}
+          <Link className={styles.modelLink} href={`/models/${encodeURIComponent(model.id)}`}>
+            {model.display_name}
+          </Link>
         </h3>
         {model.maker ? <span className="model__meta">{model.maker}</span> : null}
         <span className="model__meta">{pluralise(model.provider_count, 'provider')} competing</span>

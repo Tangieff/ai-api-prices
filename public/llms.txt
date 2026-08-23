@@ -4,6 +4,7 @@
 
 Canonical site: https://prices.oxweb.xyz/
 Machine-readable prices: https://prices.oxweb.xyz/api/prices.json
+Model detail pages: https://prices.oxweb.xyz/models/<canonical-model-id>
 
 ## What this product does
 
@@ -11,6 +12,8 @@ Machine-readable prices: https://prices.oxweb.xyz/api/prices.json
 - Compares published input, output and cache prices in USD per 1M tokens.
 - Keeps every model's provider offers ordered by the documented price score.
 - Shows a saving percentage only when the provider publishes a meaningful reference/direct price.
+- Provides indexable detail pages for individual models using the same normalized dataset and ranking.
+- Offers Claude Code, Codex and Gemini CLI model-family shortcuts without claiming relay compatibility.
 - Keeps stale last-known prices visible when one provider refresh fails instead of deleting them.
 
 ## Product boundaries
@@ -18,5 +21,7 @@ Machine-readable prices: https://prices.oxweb.xyz/api/prices.json
 OXWeb Prices is a comparison utility, not an inference gateway. It does not route model requests, hold user balances or resell tokens.
 
 The homepage intentionally features only current high-interest models; the full collected catalogue remains searchable and is available in the JSON feed.
+
+Coding-client shortcuts select relevant model families only. Actual client compatibility can vary by provider and must be checked with the provider before signup.
 
 Some outbound provider links are referral links. Referral status never changes ingestion, normalization, price calculation, ranking or which offer is marked cheapest.

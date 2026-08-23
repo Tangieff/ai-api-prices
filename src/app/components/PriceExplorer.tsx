@@ -10,17 +10,6 @@ import { pluralise, updatedLabel, utcStamp } from './format';
 import { useClock } from './useClock';
 import styles from './discovery.module.css';
 
-/**
- * Search and results.
- *
- * The whole catalogue arrives from the server already sorted and with a
- * precomputed search blob per model, so this component only filters arrays —
- * no fetching, no state library, no debounce beyond React's own deferred value.
- *
- * The homepage is intentionally curated: without a query it shows only the
- * current priority models. The full provider catalogue stays searchable.
- */
-
 const SEARCH_VISIBLE = 60;
 
 const EXAMPLE_QUERIES = [
@@ -31,6 +20,17 @@ const EXAMPLE_QUERIES = [
   'glm 5.3',
   'grok 4.6',
 ];
+
+/**
+ * Fast intent shortcuts, not compatibility claims. They narrow the price index
+ * to model families commonly used with each coding client; each relay's actual
+ * client support still needs to be checked before signup.
+ */
+const CODING_SHORTCUTS = [
+  { label: 'Claude Code', query: 'claude' },
+  { label: 'Codex', query: 'gpt 5.6 sol' },
+  { label: 'Gemini CLI', query: 'gemini' },
+] as const;
 
 interface PriceExplorerProps {
   models: ModelView[];
@@ -52,8 +52,6 @@ export function PriceExplorer({
   const deferredQuery = useDeferredValue(query);
   const inputId = useId();
 
-  // Null until mounted, so the server and client render the same markup; see
-  // `useClock`. Offer rows fall back to an absolute date until it arrives.
   const now = useClock();
   const featured = useMemo(() => pickFeaturedModels(models), [models]);
   const providerSummaries = useMemo(
@@ -83,6 +81,11 @@ export function PriceExplorer({
     if (next === view) return;
     setView(next);
     setQuery('');
+  };
+
+  const applyCodingShortcut = (queryValue: string) => {
+    setView('models');
+    setQuery(queryValue);
   };
 
   return (
@@ -138,17 +141,32 @@ export function PriceExplorer({
           </p>
 
           {view === 'models' ? (
-            <p className="hint">
-              Try{' '}
-              {EXAMPLE_QUERIES.map((example, index) => (
-                <span key={example}>
-                  {index > 0 ? ', ' : ''}
-                  <button type="button" onClick={() => setQuery(example)}>
-                    {example}
+            <>
+              <p className="hint">
+                Try{' '}
+                {EXAMPLE_QUERIES.map((example, index) => (
+                  <span key={example}>
+                    {index > 0 ? ', ' : ''}
+                    <button type="button" onClick={() => setQuery(example)}>
+                      {example}
+                    </button>
+                  </span>
+                ))}
+              </p>
+              <div className={styles.codingShortcuts}>
+                <span>Coding model shortcuts</span>
+                {CODING_SHORTCUTS.map((shortcut) => (
+                  <button
+                    key={shortcut.label}
+                    type="button"
+                    onClick={() => applyCodingShortcut(shortcut.query)}
+                  >
+                    {shortcut.label}
                   </button>
-                </span>
-              ))}
-            </p>
+                ))}
+                <small>Model-price shortcuts only; provider tool support varies.</small>
+              </div>
+            </>
           ) : null}
         </div>
       </div>
