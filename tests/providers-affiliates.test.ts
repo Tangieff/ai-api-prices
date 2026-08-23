@@ -15,6 +15,7 @@ const EXPECTED_REFERRALS = {
   llmsrelay: 'https://llmsrelay.com/auth?mode=signup&lang=ru&ref=BDF0002E42C7',
   packyapi: 'https://www.packyapi.ai/register?aff=fF9b',
   omniakey: 'https://omniakey.com/ru/register?aff=iCpK2i0Z',
+  'relay-fast': 'https://relay.fast/sign-up?aff=H9hI',
 } as const;
 
 describe('provider affiliate destinations', () => {
@@ -32,6 +33,13 @@ describe('provider affiliate destinations', () => {
       expect(provider.affiliate_url).toBe(expected ?? null);
       expect(visitUrl(provider)).toBe(expected ?? provider.website_url);
     }
+  });
+
+  it('uses the relay.fast referral for provider-name and Visit destinations', () => {
+    const provider = PROVIDERS_BY_ID.get('relay-fast');
+    expect(provider).toBeDefined();
+    expect(provider?.affiliate_url).toBe('https://relay.fast/sign-up?aff=H9hI');
+    expect(provider && visitUrl(provider)).toBe('https://relay.fast/sign-up?aff=H9hI');
   });
 
   it('keeps future-provider referrals without activating those providers prematurely', () => {

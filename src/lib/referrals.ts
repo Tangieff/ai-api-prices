@@ -18,6 +18,7 @@ export const REFERRAL_URLS = {
   llmsrelay: 'https://llmsrelay.com/auth?mode=signup&lang=ru&ref=BDF0002E42C7',
   packyapi: 'https://www.packyapi.ai/register?aff=fF9b',
   omniakey: 'https://omniakey.com/ru/register?aff=iCpK2i0Z',
+  'relay-fast': 'https://relay.fast/sign-up?aff=H9hI',
 } as const;
 
 export type ReferralProviderId = keyof typeof REFERRAL_URLS;
