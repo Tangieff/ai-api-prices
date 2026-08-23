@@ -39,10 +39,13 @@ const VENDOR_PREFIXES = [
  * thinking variant very differently, and silently merging them would show a
  * price the user cannot actually get.
  */
-// Order matters: `find` takes the first match, so the more specific
-// "non-reasoning" must precede "reasoning".
+// Order matters: `find` takes the first match, so a negated suffix must precede
+// the one it contains — "non-reasoning" before "reasoning", "non-thinking"
+// before "thinking". Miss one and the negation is left behind on the slug:
+// "glm-5.1-non-thinking" would canonicalise to the model "glm-5.1-non".
 const TIER_SUFFIXES = [
   'non-reasoning',
+  'non-thinking',
   'nothinking',
   'no-thinking',
   'reasoning',

@@ -14,9 +14,29 @@ interface ModelPageProps {
   params: Promise<{ id: string }>;
 }
 
-async function getModel(id: string) {
+/**
+ * Next hands a page's dynamic segment through percent-encoded, unlike a route
+ * handler, which receives it already decoded. Canonical model ids may contain
+ * characters `encodeURIComponent` escapes — `glm-4.7-thinking:web` arrives as
+ * `glm-4.7-thinking%3Aweb` — so the segment has to be decoded before it is
+ * compared against an id. Without that, every such model 404s while still
+ * being linked from the index and published in the sitemap.
+ *
+ * A malformed escape sequence is a bad URL, not a server error: it resolves to
+ * no model and the page renders the normal 404.
+ */
+function decodeModelId(segment: string): string | null {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return null;
+  }
+}
+
+async function getModel(segment: string) {
   const data = buildPageData(await loadDataset());
-  const model = data.models.find((candidate) => candidate.id === id) ?? null;
+  const id = decodeModelId(segment);
+  const model = id === null ? null : (data.models.find((candidate) => candidate.id === id) ?? null);
   return { data, model };
 }
 
