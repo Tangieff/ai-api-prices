@@ -1,0 +1,92 @@
+.viewSwitch {
+  display: inline-flex;
+  margin: 0 0 var(--s3);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.viewSwitch button {
+  min-width: 96px;
+  height: var(--h-control);
+  padding: 0 var(--s4);
+  border: 0;
+  border-right: 1px solid var(--rule);
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.viewSwitch button:last-child {
+  border-right: 0;
+}
+
+.viewSwitch button[data-active='true'] {
+  background: var(--action-wash);
+  color: var(--action);
+  font-weight: 600;
+}
+
+.viewSwitch button:hover:not([data-active='true']) {
+  color: var(--action);
+  background: var(--surface-2);
+}
+
+.providerLink {
+  color: var(--action);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.providerLink:hover {
+  color: var(--action-hover);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.providerNameLink {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.providerNameLink:hover {
+  color: var(--action);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.modelSaving {
+  color: var(--save-ink) !important;
+}
+
+.sourceLink {
+  color: var(--ink-faint) !important;
+  font-size: 11.5px;
+  text-decoration: underline !important;
+  text-decoration-style: dotted !important;
+  text-underline-offset: 2px;
+}
+
+.sourceLink:hover {
+  color: var(--action) !important;
+}
+
+.moreResults {
+  margin-top: var(--s4) !important;
+}
+
+@media (max-width: 720px) {
+  .viewSwitch {
+    width: 100%;
+  }
+
+  .viewSwitch button {
+    flex: 1;
+    min-width: 0;
+    height: var(--h-tap);
+  }
+}

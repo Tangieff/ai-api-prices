@@ -2,17 +2,19 @@
 
 import { useDeferredValue, useId, useMemo, useState } from 'react';
 import { pickFeaturedModels } from '@/lib/featured-models';
+import { buildProviderSummaries } from '@/lib/provider-summaries';
 import { matches } from '@/lib/search';
 import type { ModelView, ProviderRef } from '@/lib/view';
 import { ModelCard } from './ModelCard';
-import { pluralise } from './format';
+import { pluralise, updatedLabel, utcStamp } from './format';
 import { useClock } from './useClock';
+import styles from './discovery.module.css';
 
 /**
  * Search and results.
  *
  * The whole catalogue arrives from the server already sorted and with a
- * precomputed search blob per model, so this component only filters an array —
+ * precomputed search blob per model, so this component only filters arrays —
  * no fetching, no state library, no debounce beyond React's own deferred value.
  *
  * The homepage is intentionally curated: without a query it shows only the
@@ -21,7 +23,14 @@ import { useClock } from './useClock';
 
 const SEARCH_VISIBLE = 60;
 
-const EXAMPLE_QUERIES = ['fable 5', 'gpt 5.6 sol', 'opus 5', 'sonnet 5', 'glm 5.2', 'grok 4.6'];
+const EXAMPLE_QUERIES = [
+  'fable 5',
+  'gpt 5.6 sol',
+  'gemini 3.1 pro',
+  'deepseek v4 pro',
+  'glm 5.3',
+  'grok 4.6',
+];
 
 interface PriceExplorerProps {
   models: ModelView[];
@@ -39,6 +48,7 @@ export function PriceExplorer({
   providersWithPrices,
 }: PriceExplorerProps) {
   const [query, setQuery] = useState('');
+  const [view, setView] = useState<'models' | 'providers'>('models');
   const deferredQuery = useDeferredValue(query);
   const inputId = useId();
 
@@ -46,38 +56,60 @@ export function PriceExplorer({
   // `useClock`. Offer rows fall back to an absolute date until it arrives.
   const now = useClock();
   const featured = useMemo(() => pickFeaturedModels(models), [models]);
+  const providerSummaries = useMemo(
+    () => buildProviderSummaries(models, providers),
+    [models, providers],
+  );
 
-  const filtered = useMemo(() => {
-    const trimmed = deferredQuery.trim();
-    if (!trimmed) return featured;
-    return models.filter((model) => matches(model.search_text, trimmed));
-  }, [models, featured, deferredQuery]);
+  const trimmedQuery = deferredQuery.trim();
+  const searching = trimmedQuery.length > 0;
 
-  const searching = deferredQuery.trim().length > 0;
-  const visible = searching ? filtered.slice(0, SEARCH_VISIBLE) : filtered;
-  const hidden = searching ? filtered.length - visible.length : 0;
+  const modelMatches = useMemo(() => {
+    if (!trimmedQuery) return featured;
+    return models.filter((model) => matches(model.search_text, trimmedQuery));
+  }, [models, featured, trimmedQuery]);
+
+  const providerMatches = useMemo(() => {
+    if (!trimmedQuery) return providerSummaries;
+    return providerSummaries.filter((provider) => matches(provider.search_text, trimmedQuery));
+  }, [providerSummaries, trimmedQuery]);
+
+  const visibleModels = searching ? modelMatches.slice(0, SEARCH_VISIBLE) : modelMatches;
+  const hiddenModels = searching ? modelMatches.length - visibleModels.length : 0;
+  const visibleProviders = providerMatches.slice(0, SEARCH_VISIBLE);
+  const hiddenProviders = providerMatches.length - visibleProviders.length;
+
+  const switchView = (next: 'models' | 'providers') => {
+    if (next === view) return;
+    setView(next);
+    setQuery('');
+  };
 
   return (
     <>
       <div className="hero">
         <div className="shell">
           <p className="eyebrow">AI inference price index</p>
-          <h1>Compare AI model prices</h1>
+          <h1>Find the cheapest API for any AI model</h1>
           <p className="hero__lead">
-            Published prices from discount inference providers, normalised to US dollars per million
-            tokens.
+            Compare GPT, Claude, Grok, Gemini, GLM, DeepSeek and other models across discounted
+            inference providers, normalised to US dollars per million tokens.
           </p>
 
           <div className="search">
             <label className="visually-hidden" htmlFor={inputId}>
-              Search for an AI model
+              {view === 'models' ? 'Search for an AI model' : 'Search for an API provider'}
             </label>
             <input
               id={inputId}
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search Claude, GPT, Gemini, DeepSeek…"
+              placeholder={
+                view === 'models'
+                  ? 'Search Claude, GPT, Gemini, DeepSeek…'
+                  : 'Search Surplus, Frugal, WorldGate…'
+              }
               autoComplete="off"
               spellCheck={false}
               enterKeyHint="search"
@@ -94,8 +126,6 @@ export function PriceExplorer({
             ) : null}
           </div>
 
-          {/* The dataset's vital signs, sized as metadata under the control they
-              describe rather than promoted into a separate stat band. */}
           <p className="readout">
             <b>{models.length}</b> models searchable
             <span className="readout__sep">·</span>
@@ -107,53 +137,167 @@ export function PriceExplorer({
             providers reporting
           </p>
 
-          <p className="hint">
-            Try{' '}
-            {EXAMPLE_QUERIES.map((example, index) => (
-              <span key={example}>
-                {index > 0 ? ', ' : ''}
-                <button type="button" onClick={() => setQuery(example)}>
-                  {example}
-                </button>
-              </span>
-            ))}
-          </p>
+          {view === 'models' ? (
+            <p className="hint">
+              Try{' '}
+              {EXAMPLE_QUERIES.map((example, index) => (
+                <span key={example}>
+                  {index > 0 ? ', ' : ''}
+                  <button type="button" onClick={() => setQuery(example)}>
+                    {example}
+                  </button>
+                </span>
+              ))}
+            </p>
+          ) : null}
         </div>
       </div>
 
       <div className="results">
         <div className="shell">
-          <p className="results__meta" role="status">
-            {searching
-              ? `${pluralise(filtered.length, 'model')} matching “${deferredQuery.trim()}”`
-              : `${pluralise(visible.length, 'featured model')} · search all ${pluralise(models.length, 'model')}`}
-          </p>
+          <div className={styles.viewSwitch} role="group" aria-label="Browse prices by">
+            <button
+              type="button"
+              data-active={view === 'models' ? 'true' : 'false'}
+              aria-pressed={view === 'models'}
+              onClick={() => switchView('models')}
+            >
+              Models
+            </button>
+            <button
+              type="button"
+              data-active={view === 'providers' ? 'true' : 'false'}
+              aria-pressed={view === 'providers'}
+              onClick={() => switchView('providers')}
+            >
+              Providers
+            </button>
+          </div>
 
-          {visible.length === 0 ? (
-            <div className="empty">
-              <h2>No model matches “{deferredQuery.trim()}”</h2>
-              <p>
-                Coverage is limited to five providers for now, so not every model is listed. Try a
-                shorter query such as “opus” or “gpt”.
+          {view === 'models' ? (
+            <>
+              <p className="results__meta" role="status">
+                {searching
+                  ? `${pluralise(modelMatches.length, 'model')} matching “${trimmedQuery}”`
+                  : `${pluralise(visibleModels.length, 'featured model')} · search all ${pluralise(models.length, 'model')}`}
               </p>
-              <button type="button" className="button-quiet" onClick={() => setQuery('')}>
-                Back to featured models
-              </button>
-            </div>
-          ) : (
-            <div className="index">
-              {visible.map((model) => (
-                <ModelCard key={model.id} model={model} providers={providers} now={now} />
-              ))}
-            </div>
-          )}
 
-          {hidden > 0 ? (
-            <p className="results__meta">
-              {hidden} more {hidden === 1 ? 'match is' : 'matches are'} hidden — narrow the search to
-              see them.
-            </p>
-          ) : null}
+              {visibleModels.length === 0 ? (
+                <div className="empty">
+                  <h2>No model matches “{trimmedQuery}”</h2>
+                  <p>
+                    Coverage currently comes from {pluralise(providerCount, 'provider')}. Try a
+                    shorter model or family name such as “opus”, “gpt” or “deepseek”.
+                  </p>
+                  <button type="button" className="button-quiet" onClick={() => setQuery('')}>
+                    Back to featured models
+                  </button>
+                </div>
+              ) : (
+                <div className="index">
+                  {visibleModels.map((model) => (
+                    <ModelCard key={model.id} model={model} providers={providers} now={now} />
+                  ))}
+                </div>
+              )}
+
+              {hiddenModels > 0 ? (
+                <p className={`results__meta ${styles.moreResults}`}>
+                  {hiddenModels} more {hiddenModels === 1 ? 'match is' : 'matches are'} hidden —
+                  narrow the search to see them.
+                </p>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <p className="results__meta" role="status">
+                {searching
+                  ? `${pluralise(providerMatches.length, 'provider')} matching “${trimmedQuery}”`
+                  : `${pluralise(providerSummaries.length, 'provider')} with prices · sorted by model coverage`}
+              </p>
+
+              {visibleProviders.length === 0 ? (
+                <div className="empty">
+                  <h2>No provider matches “{trimmedQuery}”</h2>
+                  <p>Try a shorter provider name or return to the full provider list.</p>
+                  <button type="button" className="button-quiet" onClick={() => setQuery('')}>
+                    Show all providers
+                  </button>
+                </div>
+              ) : (
+                <div className="index">
+                  <table className="offers">
+                    <caption className="visually-hidden">
+                      Integrated providers, sorted by current model coverage
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Provider</th>
+                        <th scope="col">Models</th>
+                        <th scope="col">Cheapest</th>
+                        <th scope="col">Updated</th>
+                        <th scope="col">
+                          <span className="visually-hidden">Action</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {visibleProviders.map((provider) => (
+                        <tr key={provider.id}>
+                          <td data-label="Provider">
+                            <a
+                              className={styles.providerLink}
+                              href={provider.visit_url}
+                              target="_blank"
+                              rel="noopener noreferrer nofollow"
+                            >
+                              {provider.name}
+                            </a>
+                          </td>
+                          <td data-label="Models" className="num num--lead">
+                            {provider.model_count}
+                          </td>
+                          <td data-label="Cheapest" className="num num--muted">
+                            {provider.cheapest_count}
+                          </td>
+                          <td data-label="Updated" className="num num--muted">
+                            {provider.latest_observed_at ? (
+                              <time
+                                dateTime={provider.latest_observed_at}
+                                title={utcStamp(provider.latest_observed_at)}
+                              >
+                                {updatedLabel(provider.latest_observed_at, now)}
+                              </time>
+                            ) : (
+                              '—'
+                            )}
+                          </td>
+                          <td data-label="Visit">
+                            <a
+                              className="visit"
+                              href={provider.visit_url}
+                              target="_blank"
+                              rel="noopener noreferrer nofollow"
+                              aria-label={`Visit ${provider.name}`}
+                            >
+                              Visit
+                            </a>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {hiddenProviders > 0 ? (
+                <p className={`results__meta ${styles.moreResults}`}>
+                  {hiddenProviders} more {hiddenProviders === 1 ? 'provider is' : 'providers are'}
+                  hidden — narrow the search to see them.
+                </p>
+              ) : null}
+            </>
+          )}
         </div>
       </div>
     </>

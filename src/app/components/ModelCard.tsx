@@ -1,7 +1,8 @@
 import { formatUsd } from '@/lib/money';
 import type { ModelView, ProviderRef } from '@/lib/view';
 import { OfferRow } from './OfferRow';
-import { pluralise } from './format';
+import { formatPercent, pluralise } from './format';
+import styles from './discovery.module.css';
 
 /**
  * One model and every provider selling it, cheapest first.
@@ -26,10 +27,16 @@ export function ModelCard({
           {model.display_name}
         </h3>
         {model.maker ? <span className="model__meta">{model.maker}</span> : null}
-        <span className="model__meta">{pluralise(model.provider_count, 'provider')}</span>
+        <span className="model__meta">{pluralise(model.provider_count, 'provider')} competing</span>
         <p className="model__summary">
           from <b>{formatUsd(model.best_input_usd_per_1m)}</b> in ·{' '}
           <b>{formatUsd(model.best_output_usd_per_1m)}</b> out / 1M
+          {model.best_discount_pct !== null ? (
+            <>
+              {' '}· best published saving{' '}
+              <b className={styles.modelSaving}>−{formatPercent(model.best_discount_pct)}%</b>
+            </>
+          ) : null}
         </p>
       </header>
 

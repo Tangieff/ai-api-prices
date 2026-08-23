@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pluralise, timeAgo, updatedLabel, utcStamp } from '@/app/components/format';
+import { formatPercent, pluralise, timeAgo, updatedLabel, utcStamp } from '@/app/components/format';
 
 const NOW = Date.parse('2026-08-20T12:00:00.000Z');
 const ago = (ms: number) => new Date(NOW - ms).toISOString();
@@ -40,6 +40,13 @@ describe('utcStamp', () => {
 
   it('passes through a value it cannot parse', () => {
     expect(utcStamp('whenever')).toBe('whenever');
+  });
+});
+
+describe('formatPercent', () => {
+  it('keeps whole percentages compact and one decimal when needed', () => {
+    expect(formatPercent(50)).toBe('50');
+    expect(formatPercent(76.8)).toBe('76.8');
   });
 });
 

@@ -12,8 +12,10 @@ export const FEATURED_MODEL_IDS = [
   'gpt-5.6-sol',
   'claude-opus-5',
   'claude-sonnet-5',
-  'glm-5.2',
+  'gemini-3.1-pro',
   'grok-4.6',
+  'glm-5.3',
+  'deepseek-v4-pro',
 ] as const;
 
 export function pickFeaturedModels(models: ModelView[]): ModelView[] {

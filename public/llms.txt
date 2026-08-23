@@ -1,0 +1,22 @@
+# OXWeb Prices
+
+> Independent AI inference price index for comparing discounted API and relay providers.
+
+Canonical site: https://prices.oxweb.xyz/
+Machine-readable prices: https://prices.oxweb.xyz/api/prices.json
+
+## What this product does
+
+- Normalizes provider model names into a searchable catalogue.
+- Compares published input, output and cache prices in USD per 1M tokens.
+- Keeps every model's provider offers ordered by the documented price score.
+- Shows a saving percentage only when the provider publishes a meaningful reference/direct price.
+- Keeps stale last-known prices visible when one provider refresh fails instead of deleting them.
+
+## Product boundaries
+
+OXWeb Prices is a comparison utility, not an inference gateway. It does not route model requests, hold user balances or resell tokens.
+
+The homepage intentionally features only current high-interest models; the full collected catalogue remains searchable and is available in the JSON feed.
+
+Some outbound provider links are referral links. Referral status never changes ingestion, normalization, price calculation, ranking or which offer is marked cheapest.

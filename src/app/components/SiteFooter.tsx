@@ -1,6 +1,7 @@
 import { COST_SCORE_LABEL } from '@/lib/score';
 import type { ProviderStatusView } from '@/lib/view';
 import { utcStamp } from './format';
+import styles from './discovery.module.css';
 
 /**
  * Footer: where the numbers came from and how they were combined.
@@ -27,7 +28,11 @@ export function SiteFooter({
               {providerStatus.map((status) => (
                 <li key={status.provider_id}>
                   <span className="source-list__head">
-                    <a href={status.pricing_source_url} rel="noopener noreferrer nofollow">
+                    <a
+                      href={status.visit_url}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                    >
                       {status.name}
                     </a>
                     <span className="tag-tier">
@@ -37,6 +42,14 @@ export function SiteFooter({
                           ? 'public page'
                           : 'manual seed'}
                     </span>
+                    <a
+                      className={styles.sourceLink}
+                      href={status.pricing_source_url}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                    >
+                      pricing source
+                    </a>
                     {!status.ok ? <span className="tag-stale">refresh failed</span> : null}
                     <span className="source-list__count">
                       {status.offer_count > 0 ? `${status.offer_count} offers` : 'no prices'}
@@ -81,7 +94,7 @@ export function SiteFooter({
         <p className="colophon">
           OXWeb Prices · prices last refreshed{' '}
           {generatedAt ? <time dateTime={generatedAt}>{utcStamp(generatedAt)}</time> : 'never'} ·
-          not affiliated with any listed provider
+          some provider links are referral links; referral status never affects price ranking
         </p>
       </div>
     </footer>

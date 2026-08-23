@@ -35,6 +35,10 @@ export function updatedLabel(iso: string, now: number | null): string {
   return timeAgo(iso, now);
 }
 
+export function formatPercent(value: number): string {
+  return value.toFixed(value % 1 === 0 ? 0 : 1);
+}
+
 export function pluralise(count: number, singular: string, plural = `${singular}s`): string {
   return `${count} ${count === 1 ? singular : plural}`;
 }

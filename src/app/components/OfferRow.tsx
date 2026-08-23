@@ -1,6 +1,7 @@
 import { formatUsd } from '@/lib/money';
 import type { OfferView, ProviderRef } from '@/lib/view';
-import { updatedLabel, utcStamp } from './format';
+import { formatPercent, updatedLabel, utcStamp } from './format';
+import styles from './discovery.module.css';
 
 /**
  * One provider's price for one model.
@@ -29,7 +30,14 @@ export function OfferRow({
     <tr data-best={offer.is_best ? 'true' : 'false'}>
       <td data-label="Provider">
         <span className="provider">
-          <span className="provider__name">{provider.name}</span>
+          <a
+            className={`provider__name ${styles.providerNameLink}`}
+            href={provider.visit_url}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+          >
+            {provider.name}
+          </a>
           {offer.is_best ? <span className="badge-best">Cheapest</span> : null}
           {offer.tier ? <span className="tag-tier">{offer.tier}</span> : null}
           {provider.source_kind === 'seed' ? <span className="tag-seed">seeded</span> : null}
@@ -53,7 +61,7 @@ export function OfferRow({
 
       <td data-label="Save" data-empty={offer.discount_pct === null ? 'true' : 'false'}>
         {offer.discount_pct !== null ? (
-          <span className="badge-save">−{offer.discount_pct.toFixed(offer.discount_pct % 1 === 0 ? 0 : 1)}%</span>
+          <span className="badge-save">−{formatPercent(offer.discount_pct)}%</span>
         ) : (
           <span className="num num--muted">—</span>
         )}
