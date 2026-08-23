@@ -1,34 +1,30 @@
 import type { Metadata, Viewport } from 'next';
-import { IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
+import { Instrument_Sans } from 'next/font/google';
 import { SITE } from '@/lib/site';
 import './globals.css';
 
 /**
  * Typography.
  *
- * IBM Plex is a working typeface drawn for technical documentation, not a
- * marketing face — which is what this product is: a price index someone reads
- * to make a purchasing decision. Sans carries the interface, Mono carries every
- * figure (prices, counts, timestamps) so digits line up in columns and a price
- * is visibly a price rather than a word.
+ * Instrument Sans carries the whole interface — headings, body, figures and
+ * metadata alike. It is a working grotesque, not a marketing face, which is
+ * what this product is: a price index someone reads to make a purchasing
+ * decision.
  *
- * next/font self-hosts both at build time, so there is no third-party request
- * at runtime and no layout shift beyond the declared fallback metrics.
+ * Figures are not set in a second, monospaced face. Instrument Sans ships
+ * tabular numerals, so `font-variant-numeric: tabular-nums` gives every digit
+ * the same advance width and a column of prices still reads as a column — the
+ * alignment the table needs, without a change of typeface to announce it.
+ *
+ * next/font self-hosts it at build time, so there is no third-party request at
+ * runtime and no layout shift beyond the declared fallback metrics.
  */
-const plexSans = IBM_Plex_Sans({
+const instrumentSans = Instrument_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   display: 'swap',
   variable: '--font-sans',
   fallback: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],
-});
-
-const plexMono = IBM_Plex_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  display: 'swap',
-  variable: '--font-mono',
-  fallback: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'Liberation Mono', 'monospace'],
 });
 
 export const metadata: Metadata = {
@@ -60,7 +56,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${plexSans.variable} ${plexMono.variable}`}>
+    <html lang="en" className={instrumentSans.variable}>
       <body>{children}</body>
     </html>
   );
