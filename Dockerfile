@@ -42,9 +42,11 @@ ENV NODE_ENV=production \
     HOSTNAME=0.0.0.0
 
 # `output: 'standalone'` emits server.js plus only the traced node_modules.
-# Static assets and the dataset are not traced, so they are copied explicitly.
+# Static assets, public files and the dataset are not traced, so they are copied
+# explicitly.
 COPY --from=build --chown=node:node /app/.next/standalone ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static
+COPY --from=build --chown=node:node /app/public ./public
 COPY --from=build --chown=node:node /app/data ./data
 
 # The page revalidates every 5 minutes and writes the regenerated HTML into
