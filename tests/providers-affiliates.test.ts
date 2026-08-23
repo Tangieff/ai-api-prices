@@ -9,6 +9,7 @@ describe('provider affiliate destinations', () => {
     ['getgoapi', 'https://api.getgoapi.com/register?aff=i3VT'],
     ['boundlessapi', 'https://oneapi.boundlessapi.com/register?aff=311A'],
     ['llmsrelay', 'https://llmsrelay.com/auth?mode=signup&lang=ru&ref=BDF0002E42C7'],
+    ['frugalrelay', 'https://frugalrelay.me/register?aff=iaCy'],
   ]);
 
   it('resolves each configured A-group provider to the supplied referral URL', () => {

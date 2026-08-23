@@ -71,6 +71,15 @@ export const PROVIDERS: Provider[] = [
     source_kind: 'html',
     blurb: 'Claude relay whose effective cash price comes from discounted prepaid usage packs.',
   },
+  {
+    id: 'frugalrelay',
+    name: 'Frugal Relay',
+    website_url: 'https://frugalrelay.me/',
+    affiliate_url: 'https://frugalrelay.me/register?aff=iaCy',
+    pricing_source_url: 'https://frugalrelay.me/api/pricing',
+    source_kind: 'api',
+    blurb: 'Route-priced OpenAI/Claude relay; each offer keeps its account route visible because eligibility varies.',
+  },
 ];
 
 export const PROVIDERS_BY_ID = new Map(PROVIDERS.map((provider) => [provider.id, provider]));

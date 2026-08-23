@@ -6,6 +6,7 @@ import { worldgateAdapter } from './worldgate';
 import { getgoapiAdapter } from './getgoapi';
 import { boundlessAdapter } from './boundless';
 import { llmsrelayAdapter } from './llmsrelay';
+import { frugalRelayAdapter } from './frugal-relay';
 
 /**
  * Every provider adapter in the refresh set. New providers stay isolated in one
@@ -19,6 +20,7 @@ export const ADAPTERS: Adapter[] = [
   getgoapiAdapter,
   boundlessAdapter,
   llmsrelayAdapter,
+  frugalRelayAdapter,
 ];
 
 export type { Adapter, RawOffer } from './types';

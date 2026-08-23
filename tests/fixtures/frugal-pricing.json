@@ -1,0 +1,51 @@
+{
+  "auto_groups": [],
+  "data": [
+    {
+      "model_name": "gpt-5.6-sol",
+      "quota_type": 0,
+      "model_ratio": 2.5,
+      "completion_ratio": 6,
+      "cache_ratio": 0.1,
+      "enable_groups": ["plus_account", "pro_account", "codex_pro_200", "vip"],
+      "supported_endpoint_types": ["openai"]
+    },
+    {
+      "model_name": "claude-opus-5",
+      "quota_type": 0,
+      "model_ratio": 2.5,
+      "completion_ratio": 5,
+      "cache_ratio": 0.1,
+      "create_cache_ratio": 1.25,
+      "enable_groups": ["claude"],
+      "supported_endpoint_types": ["anthropic", "openai"]
+    },
+    {
+      "model_name": "gpt-image-2",
+      "quota_type": 1,
+      "model_ratio": 0,
+      "model_price": 0.05,
+      "completion_ratio": 0,
+      "enable_groups": ["image"],
+      "supported_endpoint_types": ["openai"]
+    }
+  ],
+  "group_ratio": {
+    "claude": 0.11,
+    "claude_sale": 0.04,
+    "image": 1,
+    "plus_account": 0.045,
+    "pro_account": 0.09,
+    "vip": 0.09
+  },
+  "pricing_version": "captured-2026-08-23",
+  "success": true,
+  "usable_group": {
+    "claude": "Claude Route",
+    "claude_sale": "Claude Sale Channel",
+    "image": "Image Route",
+    "plus_account": "Plus Account Route",
+    "pro_account": "Pro Account Route",
+    "vip": "Test only"
+  }
+}
