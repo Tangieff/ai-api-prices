@@ -20,9 +20,7 @@ describe('provider affiliate destinations', () => {
     }
   });
 
-  it('keeps the normal website fallback for providers without an affiliate deal', () => {
-    const clawhive = PROVIDERS_BY_ID.get('clawhive');
-    expect(clawhive).toBeDefined();
-    expect(visitUrl(clawhive!)).toBe(clawhive!.website_url);
+  it('does not keep the retired ClawHive provider in the active registry', () => {
+    expect(PROVIDERS_BY_ID.has('clawhive')).toBe(false);
   });
 });

@@ -1,7 +1,6 @@
 import type { Adapter } from './types';
 import { surplusIntelligenceAdapter } from './surplus-intelligence';
 import { derouterAdapter } from './derouter';
-import { clawhiveAdapter } from './clawhive';
 import { worldgateAdapter } from './worldgate';
 import { getgoapiAdapter } from './getgoapi';
 import { boundlessAdapter } from './boundless';
@@ -15,7 +14,6 @@ import { frugalRelayAdapter } from './frugal-relay';
 export const ADAPTERS: Adapter[] = [
   surplusIntelligenceAdapter,
   derouterAdapter,
-  clawhiveAdapter,
   worldgateAdapter,
   getgoapiAdapter,
   boundlessAdapter,

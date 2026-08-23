@@ -38,7 +38,7 @@ const opusFromDerouter: RawOffer = {
   reference_output_usd_per_1m: 25,
 };
 
-const opusFromClawhive: RawOffer = {
+const opusFromWorldgate: RawOffer = {
   provider_model_id: 'Claude Opus 4.8',
   input_usd_per_1m: 2.5,
   output_usd_per_1m: 12.5,
@@ -51,7 +51,7 @@ describe('refresh', () => {
     const { dataset } = await refresh({
       adapters: [
         stubAdapter('derouter', [opusFromDerouter]),
-        stubAdapter('clawhive', [opusFromClawhive]),
+        stubAdapter('worldgate', [opusFromWorldgate]),
       ],
       now: at('2026-08-20T12:00:00.000Z'),
     });
@@ -95,7 +95,7 @@ describe('refresh', () => {
     const first = await refresh({
       adapters: [
         stubAdapter('derouter', [opusFromDerouter]),
-        stubAdapter('clawhive', [opusFromClawhive]),
+        stubAdapter('worldgate', [opusFromWorldgate]),
       ],
       now: at('2026-08-20T12:00:00.000Z'),
     });
@@ -104,24 +104,21 @@ describe('refresh', () => {
       previous: first.dataset,
       adapters: [
         stubAdapter('derouter', [opusFromDerouter]),
-        failingAdapter('clawhive', 'HTTP 503 Service Unavailable'),
+        failingAdapter('worldgate', 'HTTP 503 Service Unavailable'),
       ],
       now: at('2026-08-20T13:00:00.000Z'),
     });
 
-    // Both providers still have a row for the model.
     expect(second.dataset.offers).toHaveLength(2);
 
-    const clawhive = second.dataset.provider_status.find((s) => s.provider_id === 'clawhive')!;
-    expect(clawhive.ok).toBe(false);
-    expect(clawhive.stale).toBe(true);
-    expect(clawhive.error).toMatch(/503/);
-    // The carried-over row keeps its original timestamp — it was not re-observed.
-    expect(clawhive.last_success_at).toBe('2026-08-20T12:00:00.000Z');
-    const carried = second.dataset.offers.find((o) => o.provider_id === 'clawhive')!;
+    const worldgate = second.dataset.provider_status.find((s) => s.provider_id === 'worldgate')!;
+    expect(worldgate.ok).toBe(false);
+    expect(worldgate.stale).toBe(true);
+    expect(worldgate.error).toMatch(/503/);
+    expect(worldgate.last_success_at).toBe('2026-08-20T12:00:00.000Z');
+    const carried = second.dataset.offers.find((o) => o.provider_id === 'worldgate')!;
     expect(carried.observed_at).toBe('2026-08-20T12:00:00.000Z');
 
-    // The healthy provider is untouched and freshly stamped.
     const derouter = second.dataset.provider_status.find((s) => s.provider_id === 'derouter')!;
     expect(derouter.ok).toBe(true);
     expect(derouter.stale).toBe(false);
@@ -131,14 +128,14 @@ describe('refresh', () => {
     const { dataset } = await refresh({
       adapters: [
         stubAdapter('derouter', [opusFromDerouter]),
-        failingAdapter('clawhive', 'page layout changed'),
+        failingAdapter('worldgate', 'page layout changed'),
       ],
       now: at('2026-08-20T12:00:00.000Z'),
     });
 
     expect(dataset.offers).toHaveLength(1);
-    const clawhive = dataset.provider_status.find((s) => s.provider_id === 'clawhive')!;
-    expect(clawhive).toMatchObject({ ok: false, offer_count: 0, stale: false, last_success_at: null });
+    const worldgate = dataset.provider_status.find((s) => s.provider_id === 'worldgate')!;
+    expect(worldgate).toMatchObject({ ok: false, offer_count: 0, stale: false, last_success_at: null });
   });
 
   it('does not let one adapter’s failure abort the others', async () => {
@@ -146,7 +143,7 @@ describe('refresh', () => {
       adapters: [
         failingAdapter('surplus-intelligence', 'boom'),
         failingAdapter('derouter', 'boom'),
-        stubAdapter('clawhive', [opusFromClawhive]),
+        stubAdapter('worldgate', [opusFromWorldgate]),
       ],
       now: at('2026-08-20T12:00:00.000Z'),
     });
@@ -195,7 +192,7 @@ describe('buildPageData', () => {
   async function pageData(): Promise<ReturnType<typeof buildPageData>> {
     const { dataset } = await refresh({
       adapters: [
-        stubAdapter('clawhive', [opusFromClawhive]),
+        stubAdapter('worldgate', [opusFromWorldgate]),
         stubAdapter('derouter', [opusFromDerouter]),
         stubAdapter('getgoapi', [
           { provider_model_id: 'gpt-4o', input_usd_per_1m: 2, output_usd_per_1m: 8 },
@@ -236,7 +233,7 @@ describe('buildPageData', () => {
 
   it('makes provider names searchable alongside the model', async () => {
     const data = await pageData();
-    expect(data.models[0]!.search_text).toContain('clawhive');
+    expect(data.models[0]!.search_text).toContain('worldgate');
   });
 
   it('reports an empty dataset without throwing', () => {

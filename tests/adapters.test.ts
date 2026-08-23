@@ -3,7 +3,6 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { parseMarkets } from '@/adapters/surplus-intelligence';
 import { parsePricingPage, parseOfficialPair } from '@/adapters/derouter';
-import { parseHomepage } from '@/adapters/clawhive';
 import { parseModelsPage } from '@/adapters/getgoapi';
 import { parseHomepage as parseWorldgateHomepage } from '@/adapters/worldgate';
 
@@ -39,8 +38,6 @@ describe('Surplus Intelligence adapter', () => {
   it('throws when the response is not the expected shape', () => {
     expect(() => parseMarkets({})).toThrow(/markets/);
     expect(() => parseMarkets(null)).toThrow(/markets/);
-    // A well-formed response with nothing token-priced is a parser failure, not
-    // an empty provider — it means the field names moved.
     expect(() => parseMarkets({ markets: [{ model: 'x', media_unit: 'job' }] })).toThrow();
   });
 });
@@ -82,36 +79,6 @@ describe('derouter.ai adapter', () => {
   });
 });
 
-describe('ClawHive adapter', () => {
-  const offers = parseHomepage(fixture('clawhive-home.html'));
-
-  it('reads the provider price, not the direct price', () => {
-    const haiku = offers.find((offer) => offer.provider_model_id === 'Claude Haiku 4.5');
-    expect(haiku?.input_usd_per_1m).toBe(0.5);
-    expect(haiku?.output_usd_per_1m).toBe(2.5);
-    expect(haiku?.reference_input_usd_per_1m).toBe(1);
-    expect(haiku?.reference_output_usd_per_1m).toBe(5);
-  });
-
-  it('keeps rows sold at or above market rate', () => {
-    // ClawHive lists GPT-4o above the direct price; the row belongs in the
-    // comparison, it simply earns no discount badge.
-    const gpt = offers.find((offer) => offer.provider_model_id === 'GPT-4o');
-    expect(gpt?.input_usd_per_1m).toBe(2.75);
-  });
-
-  it('skips the header row of the grid', () => {
-    expect(offers.map((offer) => offer.provider_model_id)).not.toContain('Model');
-    expect(offers.length).toBe(5);
-  });
-
-  it('throws when the price grid is gone', () => {
-    expect(() => parseHomepage('<html><body><h1>ClawHive</h1></body></html>')).toThrow(
-      /price grid/i,
-    );
-  });
-});
-
 describe('GetGoAPI adapter', () => {
   const offers = parseModelsPage(fixture('getgoapi-models.html'));
 
@@ -126,7 +93,6 @@ describe('GetGoAPI adapter', () => {
   });
 
   it('skips per-request media pricing', () => {
-    // "$0.056 /次" is per image, not per 1M tokens.
     const ids = offers.map((offer) => offer.provider_model_id);
     expect(ids).not.toContain('grok-2-image-1212');
     expect(ids).not.toContain('grok-imagine-video');
@@ -146,8 +112,6 @@ describe('WorldGate adapter', () => {
   const offers = parseWorldgateHomepage(fixture('worldgate-home.html'));
 
   it('reads USD from the price attributes rather than the rendered text', () => {
-    // The page ships a script that rewrites the visible text into the visitor's
-    // billing currency; only the attribute is guaranteed to stay USD.
     const opus = offers.find((offer) => offer.provider_model_id === 'Claude Opus 5');
     expect(opus?.input_usd_per_1m).toBe(0.26);
     expect(opus?.output_usd_per_1m).toBe(1.56);
@@ -164,9 +128,6 @@ describe('WorldGate adapter', () => {
   });
 
   it('prefers the attribute when the page ships stale text beside it', () => {
-    // Captured markup: <td data-price-usd="1.3">$1.56</td>. The page's own
-    // script overwrites that text with $1.30 on load, so the attribute is the
-    // price a visitor is quoted.
     const qwen = offers.find((offer) => offer.provider_model_id === 'Qwen 3.7 Max');
     expect(qwen?.input_usd_per_1m).toBe(1.3);
   });

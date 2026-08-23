@@ -27,15 +27,6 @@ export const PROVIDERS: Provider[] = [
     blurb: 'Fixed-rate gateway for Claude and GPT models with a published discount against list price.',
   },
   {
-    id: 'clawhive',
-    name: 'ClawHive',
-    website_url: 'https://clawhive.io/',
-    affiliate_url: null,
-    pricing_source_url: 'https://clawhive.io/',
-    source_kind: 'html',
-    blurb: 'OpenAI-compatible gateway advertising Claude models at half the direct API price.',
-  },
-  {
     id: 'worldgate',
     name: 'WorldGate',
     website_url: 'https://worldgateapi.com/',
