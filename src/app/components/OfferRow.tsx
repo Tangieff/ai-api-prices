@@ -1,4 +1,5 @@
 import { formatUsd } from '@/lib/money';
+import { normalizeProviderMetadata } from '@/lib/provider-metadata';
 import type { OfferView, ProviderRef } from '@/lib/view';
 import { formatPercent, updatedLabel, utcStamp } from './format';
 import styles from './discovery.module.css';
@@ -25,23 +26,25 @@ export function OfferRow({
   now: number | null;
 }) {
   const hasCache = offer.cache_read_usd_per_1m !== null || offer.cache_write_usd_per_1m !== null;
+  const metadata = normalizeProviderMetadata(offer.tier);
 
   return (
     <tr data-best={offer.is_best ? 'true' : 'false'}>
       <td data-label="Provider">
         <span className="provider">
-          <a
-            className={`provider__name ${styles.providerNameLink}`}
-            href={provider.visit_url}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-          >
-            {provider.name}
-          </a>
-          {offer.is_best ? <span className="badge-best">Cheapest</span> : null}
-          {offer.tier ? <span className="tag-tier">{offer.tier}</span> : null}
-          {provider.source_kind === 'seed' ? <span className="tag-seed">seeded</span> : null}
-          {offer.stale ? <span className="tag-stale">stale</span> : null}
+          <span className="provider__identity">
+            <a
+              className={`provider__name ${styles.providerNameLink}`}
+              href={provider.visit_url}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+            >
+              {provider.name}
+            </a>
+            {offer.is_best ? <span className="badge-best">Cheapest</span> : null}
+            {offer.stale ? <span className="tag-stale">stale</span> : null}
+          </span>
+          {metadata ? <span className="provider__metadata">{metadata}</span> : null}
         </span>
       </td>
 
@@ -59,11 +62,17 @@ export function OfferRow({
           : '—'}
       </td>
 
-      <td data-label="Save" data-empty={offer.discount_pct === null ? 'true' : 'false'}>
+      <td data-label="Save vs official">
         {offer.discount_pct !== null ? (
           <span className="badge-save">−{formatPercent(offer.discount_pct)}%</span>
         ) : (
-          <span className="num num--muted">—</span>
+          <span
+            className="num num--muted"
+            title={offer.discount_unavailable_reason ?? undefined}
+            aria-label={offer.discount_unavailable_reason ?? undefined}
+          >
+            —
+          </span>
         )}
       </td>
 

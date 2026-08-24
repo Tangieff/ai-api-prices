@@ -28,6 +28,7 @@ function model(id: string, offers: ModelView['offers']): ModelView {
     best_input_usd_per_1m: 1,
     best_output_usd_per_1m: 2,
     best_discount_pct: null,
+    official_baseline: null,
   };
 }
 
@@ -42,6 +43,7 @@ const offer = (
   cache_read_usd_per_1m: null,
   cache_write_usd_per_1m: null,
   discount_pct: null,
+  discount_unavailable_reason: 'Official comparable baseline unavailable',
   observed_at,
   tier: null,
   is_best,

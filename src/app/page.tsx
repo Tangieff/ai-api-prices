@@ -3,6 +3,7 @@ import { buildPageData } from '@/lib/view';
 import { SiteHeader } from './components/SiteHeader';
 import { SiteFooter } from './components/SiteFooter';
 import { PriceExplorer } from './components/PriceExplorer';
+import { LiveDataRefresh } from './components/LiveDataRefresh';
 
 /**
  * The homepage — the entire product.
@@ -12,9 +13,9 @@ import { PriceExplorer } from './components/PriceExplorer';
  * unreadable data file renders the "no prices yet" state instead of a 500.
  */
 
-// Re-read the dataset periodically so `npm run refresh-prices` shows up in a
-// long-running `next start` without a rebuild.
-export const revalidate = 300;
+// Price HTML is request-time data. Browser/CDN document caches must not outlive
+// the dataset that the five-minute backend refresh writes to disk.
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const data = buildPageData(await loadDataset());
@@ -23,6 +24,7 @@ export default async function HomePage() {
     return (
       <>
         <SiteHeader />
+        <LiveDataRefresh />
         <main className="results">
           <div className="shell">
             <div className="empty">
@@ -43,6 +45,7 @@ export default async function HomePage() {
   return (
     <>
       <SiteHeader />
+      <LiveDataRefresh />
       <main>
         <PriceExplorer
           models={data.models}

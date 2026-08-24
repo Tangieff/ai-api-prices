@@ -99,6 +99,32 @@ export function offerDiscountPct(offer: {
   );
 }
 
+/**
+ * Public saving against one canonical official model baseline.
+ *
+ * Unlike provider diagnostics, this requires both input and output on both
+ * sides so every public percentage uses exactly the documented input + 3×
+ * output comparison.
+ */
+export function offerDiscountAgainstOfficial(
+  offer: {
+    input_usd_per_1m: number | null;
+    output_usd_per_1m: number | null;
+  },
+  official: {
+    input_usd_per_1m: number;
+    output_usd_per_1m: number;
+  },
+): number | null {
+  const price = weightedMicros(offer.input_usd_per_1m, offer.output_usd_per_1m);
+  const reference = weightedMicros(
+    official.input_usd_per_1m,
+    official.output_usd_per_1m,
+  );
+  if (price === null || reference === null) return null;
+  return discountPct(fromMicros(price), fromMicros(reference));
+}
+
 /** `input + 3 * output` in micro-USD, or null when either side is missing. */
 function weightedMicros(input: number | null, output: number | null): number | null {
   const inputMicros = toMicros(input);

@@ -16,7 +16,8 @@ import type { Adapter, RawOffer } from './types';
  *    per 1M tokens. Only rows whose price cell says "1M tokens" are taken, so
  *    per-job prices are never mixed into a per-token column.
  *  - The catalogue publishes no direct/official comparison column, so these
- *    offers carry no reference price and correctly show no discount badge.
+ *    offers carry no provider reference. Public savings use the independent
+ *    official model-maker baseline layer instead.
  */
 
 const MODELS_URL = 'https://getgoapi.com/en/models';

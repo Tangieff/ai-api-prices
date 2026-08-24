@@ -19,15 +19,17 @@ export async function GET(): Promise<Response> {
     best_input_usd_per_1m: model.best_input_usd_per_1m,
     best_output_usd_per_1m: model.best_output_usd_per_1m,
     best_discount_pct: model.best_discount_pct,
+    official_baseline: model.official_baseline,
   }));
   const providers = Object.values(data.providers).sort((a, b) => a.name.localeCompare(b.name));
 
   return Response.json(
     {
-      schema_version: 1,
+      schema_version: 2,
       generated_at: data.generated_at,
       price_unit: 'USD per 1M tokens',
       ranking: COST_SCORE_LABEL,
+      discount_basis: 'Official model-maker standard API price; input + 3× output weighting',
       total_offers: data.total_offers,
       providers,
       models,

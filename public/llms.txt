@@ -11,7 +11,8 @@ Model detail pages: https://prices.oxweb.xyz/models/<canonical-model-id>
 - Normalizes provider model names into a searchable catalogue.
 - Compares published input, output and cache prices in USD per 1M tokens.
 - Keeps every model's provider offers ordered by the documented price score.
-- Shows a saving percentage only when the provider publishes a meaningful reference/direct price.
+- Shows saving versus a verified first-party model-maker standard API price when a like-for-like baseline exists.
+- Publishes baseline source, verification date, applicability notes and any time-bounded `valid_through` date in the JSON feed; expired, unavailable or incompatible comparisons remain explicit rather than guessed.
 - Provides indexable detail pages for individual models using the same normalized dataset and ranking.
 - Offers Claude Code, Codex and Gemini CLI model-family shortcuts without claiming relay compatibility.
 - Keeps stale last-known prices visible when one provider refresh fails, but excludes them from cheapest and best-price recommendations.

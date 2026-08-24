@@ -13,6 +13,7 @@ function model(id: string): ModelView {
     best_input_usd_per_1m: null,
     best_output_usd_per_1m: null,
     best_discount_pct: null,
+    official_baseline: null,
   };
 }
 

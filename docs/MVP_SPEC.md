@@ -81,13 +81,17 @@ Manual seed is acceptable when automation would delay launch. The code must make
 
 Refresh should collect adapters independently and keep successful results even when another adapter fails.
 
-## Reference price / discount
+## Official price baseline / saving
 
 Discount is an optional display field, not a prerequisite for an offer.
 
-If a source clearly provides a meaningful reference/list price, calculate the percentage consistently.
+Public saving means saving versus a verified first-party model-maker standard API price for the
+same canonical model, calculated with the product's `input + 3 × output` weighting in integer
+micro-USD. Store model id, prices, source URL, verification date and material applicability notes.
 
-If a model has no sensible single reference price, display only the actual provider prices.
+Provider-supplied reference/list prices may remain as ingestion diagnostics, but do not determine
+whether the public saving appears. If a model or tier has no sensible like-for-like official
+baseline, display the actual provider prices and an accessible explained `—` rather than guessing.
 
 ## Visual direction
 

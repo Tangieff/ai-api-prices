@@ -1,4 +1,9 @@
 import type { Dataset, Offer, ProviderStatus } from './types';
+import { offerDiscountAgainstOfficial } from './money';
+import {
+  officialPriceComparison,
+  type OfficialPriceBaseline,
+} from './official-prices';
 import { PROVIDERS_BY_ID, visitUrl } from './providers';
 import { compareOffers, costScoreMicros } from './score';
 import { buildSearchText } from './search';
@@ -31,6 +36,8 @@ export interface OfferView {
   cache_read_usd_per_1m: number | null;
   cache_write_usd_per_1m: number | null;
   discount_pct: number | null;
+  /** Why a public saving badge is unavailable, used by the accessible dash. */
+  discount_unavailable_reason: string | null;
   observed_at: string;
   tier: string | null;
   /** True when this is the cheapest comparable offer for the model. */
@@ -50,8 +57,10 @@ export interface ModelView {
   /** Cheapest input price across providers, used for the summary line. */
   best_input_usd_per_1m: number | null;
   best_output_usd_per_1m: number | null;
-  /** Largest discount available for this model, if any provider publishes one. */
+  /** Largest saving versus the official standard API baseline, when comparable. */
   best_discount_pct: number | null;
+  /** Auditable first-party maker price used by every comparable offer. */
+  official_baseline: OfficialPriceBaseline | null;
 }
 
 export interface ProviderStatusView extends ProviderStatus {
@@ -72,15 +81,28 @@ export interface PageData {
   total_offers: number;
 }
 
-function toOfferView(offer: Offer, isBest: boolean, stale: boolean): OfferView | null {
+function toOfferView(offer: Offer, isBest: boolean, stale: boolean, now: Date): OfferView | null {
   if (!PROVIDERS_BY_ID.has(offer.provider_id)) return null;
+  const comparison = officialPriceComparison(offer, now);
+  const discount =
+    comparison.comparable && comparison.baseline
+      ? offerDiscountAgainstOfficial(offer, comparison.baseline)
+      : null;
+  const discountUnavailableReason =
+    comparison.unavailable_reason ??
+    (discount === null
+      ? offer.input_usd_per_1m === null || offer.output_usd_per_1m === null
+        ? 'Comparable input and output prices unavailable'
+        : 'No saving vs official standard API price'
+      : null);
   return {
     provider_id: offer.provider_id,
     input_usd_per_1m: offer.input_usd_per_1m,
     output_usd_per_1m: offer.output_usd_per_1m,
     cache_read_usd_per_1m: offer.cache_read_usd_per_1m,
     cache_write_usd_per_1m: offer.cache_write_usd_per_1m,
-    discount_pct: offer.discount_pct,
+    discount_pct: discount,
+    discount_unavailable_reason: discountUnavailableReason,
     observed_at: offer.observed_at,
     tier: offer.tier,
     is_best: isBest,
@@ -89,7 +111,7 @@ function toOfferView(offer: Offer, isBest: boolean, stale: boolean): OfferView |
 }
 
 /** Transform the stored dataset into everything the homepage needs. */
-export function buildPageData(dataset: Dataset): PageData {
+export function buildPageData(dataset: Dataset, now: Date = new Date()): PageData {
   const staleProviders = new Set(
     dataset.provider_status.filter((status) => status.stale).map((status) => status.provider_id),
   );
@@ -118,7 +140,9 @@ export function buildPageData(dataset: Dataset): PageData {
     );
 
     const offers = sorted
-      .map((offer) => toOfferView(offer, offer === cheapest, staleProviders.has(offer.provider_id)))
+      .map((offer) =>
+        toOfferView(offer, offer === cheapest, staleProviders.has(offer.provider_id), now),
+      )
       .filter((offer): offer is OfferView => offer !== null);
     if (offers.length === 0) continue;
 
@@ -150,6 +174,7 @@ export function buildPageData(dataset: Dataset): PageData {
       best_input_usd_per_1m: prices.length > 0 ? Math.min(...prices) : null,
       best_output_usd_per_1m: outputs.length > 0 ? Math.min(...outputs) : null,
       best_discount_pct: discounts.length > 0 ? Math.max(...discounts) : null,
+      official_baseline: officialPriceComparison({ model_id: model.id, tier: null }, now).baseline,
     });
   }
 

@@ -6,9 +6,10 @@ import { buildPageData } from '@/lib/view';
 import { ModelCard } from '@/app/components/ModelCard';
 import { SiteFooter } from '@/app/components/SiteFooter';
 import { SiteHeader } from '@/app/components/SiteHeader';
+import { LiveDataRefresh } from '@/app/components/LiveDataRefresh';
 import styles from './model-page.module.css';
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 interface ModelPageProps {
   params: Promise<{ id: string }>;
@@ -48,7 +49,7 @@ export async function generateMetadata({ params }: ModelPageProps): Promise<Meta
   const providerLabel = model.provider_count === 1 ? 'provider' : 'providers';
   return {
     title: `${model.display_name} API prices`,
-    description: `Compare published ${model.display_name} API prices across ${model.provider_count} discount inference ${providerLabel}. Input, output, cache and published savings in USD per million tokens.`,
+    description: `Compare published ${model.display_name} API prices across ${model.provider_count} discount inference ${providerLabel}. Input, output, cache and savings versus the official standard API price in USD per million tokens.`,
     alternates: { canonical: `/models/${encodeURIComponent(model.id)}` },
   };
 }
@@ -61,6 +62,7 @@ export default async function ModelPage({ params }: ModelPageProps) {
   return (
     <>
       <SiteHeader />
+      <LiveDataRefresh />
       <main>
         <div className={styles.head}>
           <div className="shell">

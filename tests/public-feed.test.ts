@@ -8,16 +8,25 @@ describe('GET /api/prices.json', () => {
       schema_version: number;
       price_unit: string;
       providers: Array<{ id: string; visit_url: string }>;
-      models: Array<Record<string, unknown>>;
+      models: Array<{
+        id: string;
+        official_baseline: null | { model_id: string; valid_through?: string };
+        [key: string]: unknown;
+      }>;
     };
 
     expect(response.status).toBe(200);
     expect(response.headers.get('cache-control')).toContain('s-maxage=300');
-    expect(body.schema_version).toBe(1);
+    expect(body.schema_version).toBe(2);
     expect(body.price_unit).toBe('USD per 1M tokens');
     expect(body).not.toHaveProperty('referral_disclosure');
     expect(body.models.length).toBeGreaterThan(0);
     expect(body.models[0]).not.toHaveProperty('search_text');
+    expect(body.models.some((model) => model.official_baseline !== null)).toBe(true);
+    expect(body.models.find((model) => model.id === 'claude-sonnet-5')?.official_baseline).toMatchObject({
+      model_id: 'claude-sonnet-5',
+      valid_through: '2026-08-31',
+    });
 
     const derouter = body.providers.find((provider) => provider.id === 'derouter');
     expect(derouter?.visit_url).toBe('https://derouter.ai?ref=mZxRdS1y');

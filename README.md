@@ -72,9 +72,10 @@ previous run are carried forward, marked `stale` in the UI, and the error is rec
 `provider_status`. Every other provider refreshes normally. The public page always renders the last
 usable dataset.
 
-The running site re-reads `data/prices.json` at most every 5 minutes (`revalidate` in
-`src/app/page.tsx`), so a refresh appears without a rebuild. In development it is picked up on
-reload.
+Homepage and model-page HTML read `data/prices.json` dynamically on every request and use private
+no-cache/no-store response headers. Already-open pages call `router.refresh()` every five minutes,
+on a throttled foreground return, and after BFCache restoration, so a refresh appears without a
+rebuild, app restart or manual browser reload.
 
 ## Providers
 
@@ -113,11 +114,11 @@ Nothing else needs to change: model grouping, discounts, sorting and rendering a
   integer micro-USD. Output is weighted higher because it is priced several times above input; the
   score is an ordering rule, not a cost estimate. Offers missing a price are not comparable and sort
   last. See `src/lib/score.ts`.
-- **Discounts.** A `Save` badge appears only where the provider itself publishes a list or direct
-  price to compare against (`direct_*` from Surplus Intelligence, "Official I/O" from derouter,
-  "Direct API" from ClawHive). Where no meaningful reference exists — GetGoAPI publishes none, and
-  WorldGate's "Official I/O" column currently reads "—" for every model — the absolute prices are
-  shown and the badge is omitted. No universal baseline is invented.
+- **Savings.** `Save vs official` uses one verified first-party model-maker standard API baseline
+  per canonical model and the same `input + 3 × output` weighting as ranking. Provider-published
+  reference fields remain diagnostic source data but do not control the public percentage. When a
+  model or special tier has no like-for-like official baseline, the UI shows an explained `—`;
+  prices at or above official never produce a saving badge.
 - **Model grouping.** Providers spell the same model differently (`claude-opus-4.5`,
   `claude-opus-4-5-20251101`, `Claude Opus 4.5`). `src/lib/models.ts` folds these onto one slug by
   stripping vendor prefixes and date stamps and normalising version separators. Reasoning-effort

@@ -464,6 +464,13 @@ a {
 
 .provider {
   display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: var(--s1);
+}
+
+.provider__identity {
+  display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--s2);
@@ -496,16 +503,12 @@ a {
   white-space: nowrap;
 }
 
-.tag-tier,
-.tag-seed {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.05em;
+.provider__metadata {
+  display: block;
+  max-width: 28rem;
+  font-size: 11px;
+  line-height: 1.35;
   color: var(--ink-faint);
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius-sm);
-  padding: 1px var(--s1);
-  white-space: nowrap;
 }
 
 .tag-stale {

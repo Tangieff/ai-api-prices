@@ -36,7 +36,7 @@ export function ModelCard({
           <b>{formatUsd(model.best_output_usd_per_1m)}</b> out / 1M
           {model.best_discount_pct !== null ? (
             <>
-              {' '}· best published saving{' '}
+              {' '}· best saving vs official{' '}
               <b className={styles.modelSaving}>−{formatPercent(model.best_discount_pct)}%</b>
             </>
           ) : null}
@@ -53,7 +53,9 @@ export function ModelCard({
             <th scope="col">Input / 1M</th>
             <th scope="col">Output / 1M</th>
             <th scope="col">Cache R / W</th>
-            <th scope="col">Save</th>
+            <th scope="col" title="Saving versus the model maker's standard API price">
+              Save vs official
+            </th>
             <th scope="col">Updated</th>
             <th scope="col">
               <span className="visually-hidden">Action</span>

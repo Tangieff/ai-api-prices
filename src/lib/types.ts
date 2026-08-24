@@ -44,7 +44,7 @@ export interface Offer {
   cache_write_usd_per_1m: number | null;
   reference_input_usd_per_1m: number | null;
   reference_output_usd_per_1m: number | null;
-  /** Percentage below the reference price, or null when no meaningful reference exists. */
+  /** Provider-reference diagnostic; public savings are rebuilt from official model baselines. */
   discount_pct: number | null;
   /** UTC ISO-8601 instant the price was read from the source. */
   observed_at: string;

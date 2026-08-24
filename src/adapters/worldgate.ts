@@ -23,7 +23,8 @@ import type { Adapter, RawOffer } from './types';
  *
  * The "Official I/O" column is the provider's own comparison against list
  * pricing. It currently renders as "—" for every model, so those rows simply
- * carry no reference price and show no discount badge. The same script
+ * carry no provider reference. Public savings use the independent official
+ * model-maker baseline instead. The same script
  * populates that cell from `data-official-input-usd` / `data-official-output-usd`
  * when WorldGate does publish a comparison, so the parser reads those
  * attributes and picks up the reference price the day they appear.
