@@ -2,6 +2,7 @@ import { fetchText } from '@/lib/http';
 import { rowCells, tableRows } from '@/lib/html';
 import { parseUsd } from '@/lib/money';
 import type { Adapter, RawOffer } from './types';
+import { isComparableTextTokenModel } from './text-model';
 
 /**
  * GetGoAPI — public model catalogue parser.
@@ -36,7 +37,7 @@ export function parseModelsPage(html: string): RawOffer[] {
     if (cells.length < 6) continue;
 
     const name = cells[1]?.trim();
-    if (!name) continue;
+    if (!name || !isComparableTextTokenModel(name)) continue;
 
     const input = parseTokenPrice(cells[4]);
     const output = parseTokenPrice(cells[5]);

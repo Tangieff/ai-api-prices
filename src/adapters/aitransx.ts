@@ -1,5 +1,6 @@
 import { fetchJson } from '@/lib/http';
 import type { Adapter, RawOffer } from './types';
+import { isComparableTextTokenModel } from './text-model';
 
 const PRICING_URL = 'https://aitransx.com/api/pricing';
 
@@ -23,10 +24,7 @@ function positive(value: unknown): number | null {
 }
 
 function isTextTokenModel(id: string): boolean {
-  return (
-    !id.startsWith('~') &&
-    !/(?:^|[-/])(?:image|video|audio|tts|embedding|whisper|sora|veo)(?:[-/.]|$)/i.test(id)
-  );
+  return !id.startsWith('~') && isComparableTextTokenModel(id);
 }
 
 export function parsePricing(payload: unknown): RawOffer[] {

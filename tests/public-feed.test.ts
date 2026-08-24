@@ -23,9 +23,9 @@ describe('GET /api/prices.json', () => {
     expect(body.models.length).toBeGreaterThan(0);
     expect(body.models[0]).not.toHaveProperty('search_text');
     expect(body.models.some((model) => model.official_baseline !== null)).toBe(true);
-    expect(body.models.find((model) => model.id === 'claude-sonnet-5')?.official_baseline).toMatchObject({
-      model_id: 'claude-sonnet-5',
-      valid_through: '2026-08-31',
+    expect(body.models.find((model) => model.id === 'gpt-5.6-sol')?.official_baseline).toMatchObject({
+      model_id: 'gpt-5.6-sol',
+      valid_through: '2026-11-21',
     });
 
     const derouter = body.providers.find((provider) => provider.id === 'derouter');

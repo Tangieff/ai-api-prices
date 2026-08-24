@@ -56,14 +56,19 @@ function pageData(offers: Offer[], now: Date = new Date(observedAt)) {
 }
 
 describe('official model-maker price baselines', () => {
-  it('covers every featured model with current first-party provenance', () => {
+  it('covers every safely comparable featured model with current first-party provenance', () => {
+    const unavailableFeatured = new Set(['gemini-3.1-pro', 'deepseek-v4-pro']);
     expect(OFFICIAL_PRICE_BASELINES.size).toBeGreaterThan(FEATURED_MODEL_IDS.length);
-    for (const id of FEATURED_MODEL_IDS) {
+    for (const id of FEATURED_MODEL_IDS.filter((modelId) => !unavailableFeatured.has(modelId))) {
       const baseline = OFFICIAL_PRICE_BASELINES.get(id);
       expect(baseline, id).toBeDefined();
       expect(baseline?.source_url).toMatch(/^https:\/\//);
       expect(baseline?.verified_at).toBe('2026-08-24');
       expect(baseline?.note.length).toBeGreaterThan(10);
+    }
+    for (const id of unavailableFeatured) {
+      expect(OFFICIAL_PRICE_BASELINES.has(id)).toBe(false);
+      expect(officialPriceComparison({ model_id: id, tier: null }).comparable).toBe(false);
     }
   });
 
@@ -75,55 +80,72 @@ describe('official model-maker price baselines', () => {
     expect(timeBounded).toEqual([
       ['gpt-5.6', '2026-11-21'],
       ['gpt-5.6-sol', '2026-11-21'],
-      ['claude-sonnet-5', '2026-08-31'],
     ]);
   });
 
-  it('uses the Claude Sonnet 5 promotional baseline through its final UTC day', () => {
+  it('keeps Claude Sonnet 5 comparable after its cancelled price increase date', () => {
     const comparison = officialPriceComparison(
       { model_id: 'claude-sonnet-5', tier: null },
-      new Date('2026-08-31T23:59:59.999Z'),
+      new Date('2026-09-01T00:00:00.000Z'),
     );
 
     expect(comparison).toMatchObject({
       comparable: true,
       unavailable_reason: null,
-      baseline: { valid_through: '2026-08-31' },
+      baseline: { input_usd_per_1m: 2, output_usd_per_1m: 10 },
     });
+    expect(comparison.baseline).not.toHaveProperty('valid_through');
   });
 
   it('fails closed after a promotional baseline expires without guessing its successor', () => {
     const expired = officialPriceComparison(
-      { model_id: 'claude-sonnet-5', tier: null },
-      new Date('2026-09-01T00:00:00.000Z'),
+      { model_id: 'gpt-5.6-sol', tier: null },
+      new Date('2026-11-22T00:00:00.000Z'),
     );
     expect(expired).toMatchObject({
       comparable: false,
       unavailable_reason: 'Official baseline requires re-verification',
-      baseline: { valid_through: '2026-08-31' },
+      baseline: { valid_through: '2026-11-21' },
     });
 
     const data = pageData(
       [
         offer('worldgate', {
-          model_id: 'claude-sonnet-5',
+          model_id: 'gpt-5.6-sol',
           input_usd_per_1m: 1,
           output_usd_per_1m: 5,
         }),
       ],
-      new Date('2026-09-01T00:00:00.000Z'),
+      new Date('2026-11-22T00:00:00.000Z'),
     );
 
     expect(data.models[0]!.official_baseline).toMatchObject({
-      input_usd_per_1m: 2,
-      output_usd_per_1m: 10,
-      valid_through: '2026-08-31',
+      input_usd_per_1m: 4,
+      output_usd_per_1m: 20,
+      valid_through: '2026-11-21',
     });
     expect(data.models[0]!.offers[0]).toMatchObject({
       discount_pct: null,
       discount_unavailable_reason: 'Official baseline requires re-verification',
     });
     expect(data.models[0]!.best_discount_pct).toBeNull();
+  });
+
+  it('fails closed for time-dependent and non-first-party shorthand baselines', () => {
+    for (const model_id of [
+      'deepseek-v4-pro',
+      'deepseek-v4-flash',
+      'gemini-3.1-pro',
+      'gemini-3-flash',
+      'gemini-3.1-flash-lite-preview',
+    ]) {
+      expect(OFFICIAL_PRICE_BASELINES.has(model_id)).toBe(false);
+      expect(officialPriceComparison({ model_id, tier: null })).toMatchObject({
+        baseline: null,
+        comparable: false,
+        unavailable_reason: 'Official comparable baseline unavailable',
+      });
+    }
   });
 
   it('leaves permanent baselines comparable regardless of the injected date', () => {

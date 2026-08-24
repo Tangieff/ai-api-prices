@@ -21,13 +21,12 @@ const VERIFIED_AT = '2026-08-24';
 const OPENAI_SOURCE = 'https://developers.openai.com/api/docs/models/compare';
 const OPENAI_SOL_SOURCE = 'https://developers.openai.com/api/docs/models/gpt-5.6-sol';
 const ANTHROPIC_OPUS_SOURCE = 'https://www.anthropic.com/claude/opus';
-const ANTHROPIC_SONNET_SOURCE = 'https://www.anthropic.com/news/claude-sonnet-5';
+const ANTHROPIC_SONNET_SOURCE = 'https://platform.claude.com/docs/en/release-notes/overview';
 const ANTHROPIC_FABLE_SOURCE = 'https://www.anthropic.com/claude/fable';
 const ANTHROPIC_CATALOGUE_SOURCE =
   'https://www-cdn.anthropic.com/files/4zrzovbb/website/5678bc2f5978e5bcd4f1fe7c14b2c72284dcf9f8.pdf';
 const GOOGLE_SOURCE = 'https://ai.google.dev/gemini-api/docs/pricing';
 const XAI_SOURCE = 'https://docs.x.ai/developers/pricing';
-const DEEPSEEK_SOURCE = 'https://api-docs.deepseek.com/quick_start/pricing';
 const ZAI_SOURCE = 'https://docs.z.ai/guides/overview/pricing';
 
 function baseline(
@@ -77,8 +76,7 @@ const records: OfficialPriceBaseline[] = [
     2,
     10,
     ANTHROPIC_SONNET_SOURCE,
-    'Introductory global standard price through 2026-08-31; then $3 input / $15 output.',
-    '2026-08-31',
+    'Global standard Claude API pricing; the previously announced 2026-09-01 increase was cancelled.',
   ),
   baseline('claude-opus-4.8', 5, 25, ANTHROPIC_CATALOGUE_SOURCE, 'Global standard Claude API pricing.'),
   baseline('claude-opus-4.7', 5, 25, ANTHROPIC_CATALOGUE_SOURCE, 'Global standard Claude API pricing.'),
@@ -91,21 +89,24 @@ const records: OfficialPriceBaseline[] = [
   baseline('claude-sonnet-4', 3, 15, ANTHROPIC_CATALOGUE_SOURCE, 'Global standard Claude API pricing up to 200K context.'),
   baseline('claude-haiku-4.5', 1, 5, ANTHROPIC_CATALOGUE_SOURCE, 'Global standard Claude API pricing up to 200K context.'),
 
-  baseline('gemini-3.1-pro', 2, 12, GOOGLE_SOURCE, 'Gemini Developer API standard pricing for prompts up to 200K tokens.'),
   baseline('gemini-3.1-pro-preview', 2, 12, GOOGLE_SOURCE, 'Gemini Developer API standard pricing for prompts up to 200K tokens; preview model.'),
   baseline('gemini-3.1-pro-preview-customtools', 2, 12, GOOGLE_SOURCE, 'Gemini Developer API standard custom-tools pricing for prompts up to 200K tokens; preview model.'),
-  baseline('gemini-3-flash', 0.5, 3, GOOGLE_SOURCE, 'Gemini Developer API standard text pricing.'),
   baseline('gemini-3-flash-preview', 0.5, 3, GOOGLE_SOURCE, 'Gemini Developer API standard text pricing; preview model.'),
   baseline('gemini-3.1-flash-lite', 0.25, 1.5, GOOGLE_SOURCE, 'Gemini Developer API standard text pricing.'),
-  baseline('gemini-3.1-flash-lite-preview', 0.25, 1.5, GOOGLE_SOURCE, 'Gemini Developer API standard text pricing; preview model.'),
   baseline('gemini-3.5-flash-lite', 0.3, 2.5, GOOGLE_SOURCE, 'Gemini Developer API standard text pricing.'),
+
+  // Do not map provider shorthand such as `gemini-3.1-pro` or `gemini-3-flash`
+  // onto Google's preview SKUs. They are not current first-party model ids.
+  // The retired `gemini-3.1-flash-lite-preview` is intentionally absent too.
 
   baseline('grok-4.6', 2, 6, XAI_SOURCE, 'Standard short-context pricing below 200K prompt tokens.'),
   baseline('grok-4.5', 2, 6, XAI_SOURCE, 'Standard short-context pricing below 200K prompt tokens.'),
   baseline('grok-4.3', 1.25, 2.5, XAI_SOURCE, 'Standard short-context pricing below 200K prompt tokens.'),
 
-  baseline('deepseek-v4-pro', 0.435, 0.87, DEEPSEEK_SOURCE, 'Standard cache-miss input and output pricing; cache hits cost less.'),
-  baseline('deepseek-v4-flash', 0.14, 0.28, DEEPSEEK_SOURCE, 'Standard cache-miss input and output pricing; cache hits cost less.'),
+  // DeepSeek V4 pricing is time-of-day dependent (peak and off-peak). OXP
+  // cannot honestly represent either schedule as one universal standard
+  // baseline, so those public comparisons fail closed until the data model can
+  // match an offer to the applicable official schedule.
 
   baseline('glm-5.3', 1.4, 4.4, ZAI_SOURCE, 'Standard Z.ai pay-as-you-go text pricing.'),
   baseline('glm-5.2', 1.4, 4.4, ZAI_SOURCE, 'Standard Z.ai pay-as-you-go text pricing.'),
