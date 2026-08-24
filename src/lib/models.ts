@@ -111,7 +111,7 @@ export interface CanonicalModel {
  * Steps, in order:
  *   1. lowercase, trim, collapse separators (spaces, underscores) to `-`;
  *   2. drop a vendor namespace prefix (`anthropic/claude-opus-5`);
- *   3. drop release-date stamps (`-20251101`, `-2026-03-17`);
+ *   3. preserve release-date snapshots as a tier (`snapshot 2025-11-01`);
  *   4. peel a trailing reasoning-effort suffix into `tier`;
  *   5. rejoin split version numbers (`opus-4-5` -> `opus-4.5`).
  */
@@ -130,10 +130,6 @@ export function canonicalModelId(raw: string): CanonicalModel {
     .replace(/[^a-z0-9.:-]/g, '')
     .replace(/-{2,}/g, '-')
     .replace(/^-|-$/g, '');
-
-  // Release-date stamps: -20251101 and -2026-03-17.
-  slug = slug.replace(/-(19|20)\d{2}-\d{2}-\d{2}\b/g, '');
-  slug = slug.replace(/-(19|20)\d{6}\b/g, '');
 
   let tier: string | null = null;
 
@@ -154,6 +150,25 @@ export function canonicalModelId(raw: string): CanonicalModel {
     slug = slug.slice(0, -(suffix.length + 1));
   }
   if (tier && pendingBudget) tier = `${tier}-${pendingBudget}`;
+
+  // Snapshot ids are the same model family but can remain separately
+  // selectable and materially differently priced. Keep the date as a tier so
+  // deduplication may remove equal-price aliases without silently replacing a
+  // distinct old snapshot with the cheapest current alias.
+  let snapshot: string | null = null;
+  const dashedDate = /-((?:19|20)\d{2})-(\d{2})-(\d{2})$/.exec(slug);
+  const compactDate = /-((?:19|20)\d{2})(\d{2})(\d{2})$/.exec(slug);
+  const date = dashedDate ?? compactDate;
+  if (date) {
+    snapshot = `snapshot ${date[1]}-${date[2]}-${date[3]}`;
+    slug = slug.slice(0, -date[0].length);
+  }
+  if (snapshot) tier = tier ? `${snapshot} · ${tier}` : snapshot;
+
+  // Alibaba's official ids use `qwen3.5`, `qwen3.6`, etc. Provider catalogues
+  // also publish `qwen-3.6-*` and `qwen3-6-*`; these spellings identify the
+  // same documented series, while `qwen3-8b` (Qwen 3, 8B) must stay distinct.
+  slug = slug.replace(/^qwen-?3[-.]([5-9])(?=-|$)/, 'qwen3.$1');
 
   // Version numbers split across separators: "opus-4-5" -> "opus-4.5",
   // "aion-2-0" -> "aion-2.0". Only single-to-double digit groups qualify, so

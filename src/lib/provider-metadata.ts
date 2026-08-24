@@ -18,6 +18,14 @@ export function normalizeProviderMetadata(tier: string | null): string | null {
   if (!tier?.trim()) return null;
   const raw = tier.trim();
 
+  if (/^snapshot\s+(?:19|20)\d{2}-\d{2}-\d{2}$/i.test(raw)) {
+    return `Snapshot: ${raw.slice('snapshot '.length)}`;
+  }
+  const snapshotMode = /^snapshot\s+((?:19|20)\d{2}-\d{2}-\d{2})\s*·\s*(.+)$/i.exec(raw);
+  if (snapshotMode) {
+    return `Snapshot: ${snapshotMode[1]} · Mode: ${normalizeContext(snapshotMode[2] ?? '')}`;
+  }
+
   if (/^\$[\d.]+\s*→\s*\$[\d.]+\s+(?:usage|credit)$/i.test(raw)) {
     return `Plan: ${raw.replace(/\s+usage$/i, ' usage credit')}`;
   }

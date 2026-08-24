@@ -33,6 +33,10 @@ describe('provider metadata presentation', () => {
   });
 
   it('uses a labelled fallback and omits empty metadata', () => {
+    expect(normalizeProviderMetadata('snapshot 2024-05-13')).toBe('Snapshot: 2024-05-13');
+    expect(normalizeProviderMetadata('snapshot 2025-10-01 · thinking')).toBe(
+      'Snapshot: 2025-10-01 · Mode: thinking',
+    );
     expect(normalizeProviderMetadata('unclassified-special')).toBe('Tier: unclassified special');
     expect(normalizeProviderMetadata(null)).toBeNull();
     expect(normalizeProviderMetadata('')).toBeNull();

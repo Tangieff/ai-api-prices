@@ -1,5 +1,6 @@
 import { fetchJson } from '@/lib/http';
 import type { Adapter, RawOffer } from './types';
+import { isComparableTextTokenModel } from './text-model';
 
 const MODELS_URL = 'https://api.tokenmix.ai/api/models';
 const PAGE_SIZE = 100;
@@ -48,6 +49,7 @@ export function parseModelsPage(payload: unknown): { offers: RawOffer[]; totalPa
     if (
       !row ||
       typeof row.model_id !== 'string' ||
+      !isComparableTextTokenModel(row.model_id) ||
       row.model_type !== 'chat' ||
       row.status !== 1
     ) {

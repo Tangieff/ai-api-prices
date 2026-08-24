@@ -1,5 +1,6 @@
 import { fetchJson } from '@/lib/http';
 import type { Adapter, RawOffer } from './types';
+import { isComparableTextTokenModel } from './text-model';
 
 /**
  * Surplus Intelligence — public marketplace API.
@@ -47,7 +48,12 @@ export function parseMarkets(payload: unknown): RawOffer[] {
 
   const offers: RawOffer[] = [];
   for (const entry of markets as MarketRow[]) {
-    if (!entry || typeof entry.model !== 'string' || !entry.model) continue;
+    if (
+      !entry ||
+      typeof entry.model !== 'string' ||
+      !entry.model ||
+      !isComparableTextTokenModel(entry.model)
+    ) continue;
 
     // Media listings price per job/second rather than per token; the comparison
     // table only deals in per-1M-token prices, so they are skipped rather than

@@ -16,9 +16,26 @@ describe('canonicalModelId', () => {
     expect(ids[0]).toBe('claude-opus-4.5');
   });
 
-  it('strips release-date stamps in both formats', () => {
-    expect(canonicalModelId('claude-haiku-4-5-20251001').id).toBe('claude-haiku-4.5');
-    expect(canonicalModelId('gpt-5.4-mini-2026-03-17').id).toBe('gpt-5.4-mini');
+  it('keeps release-date snapshots as tiers in both formats', () => {
+    expect(canonicalModelId('claude-haiku-4-5-20251001')).toEqual({
+      id: 'claude-haiku-4.5',
+      tier: 'snapshot 2025-10-01',
+    });
+    expect(canonicalModelId('gpt-5.4-mini-2026-03-17')).toEqual({
+      id: 'gpt-5.4-mini',
+      tier: 'snapshot 2026-03-17',
+    });
+    expect(canonicalModelId('claude-haiku-4-5-20251001-thinking')).toEqual({
+      id: 'claude-haiku-4.5',
+      tier: 'snapshot 2025-10-01 · thinking',
+    });
+  });
+
+  it('normalizes documented Qwen 3.5+ series spellings without merging Qwen 3 sizes', () => {
+    expect(canonicalModelId('qwen/qwen3.6-35b-a3b').id).toBe('qwen3.6-35b-a3b');
+    expect(canonicalModelId('qwen-3.6-35b-a3b').id).toBe('qwen3.6-35b-a3b');
+    expect(canonicalModelId('qwen3-6-35b-a3b').id).toBe('qwen3.6-35b-a3b');
+    expect(canonicalModelId('qwen3-8b').id).toBe('qwen3-8b');
   });
 
   it('strips vendor namespaces observed in the Wave 1 catalogues', () => {
