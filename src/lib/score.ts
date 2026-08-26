@@ -27,6 +27,12 @@ export function costScoreMicros(offer: Pick<Offer, 'input_usd_per_1m' | 'output_
 /** Human-readable description of the score, shown in the UI so the sort is not a black box. */
 export const COST_SCORE_LABEL = 'input + 3 x output';
 
+/** The fields the comparator actually reads. Lets projected views reuse it verbatim. */
+export type ComparableOffer = Pick<
+  Offer,
+  'input_usd_per_1m' | 'output_usd_per_1m' | 'provider_id' | 'tier'
+>;
+
 /**
  * Sort comparator for offers within a single model.
  *
@@ -34,7 +40,7 @@ export const COST_SCORE_LABEL = 'input + 3 x output';
  * price, then a stable tie-break on provider id so refreshes do not reshuffle
  * equal rows.
  */
-export function compareOffers(a: Offer, b: Offer): number {
+export function compareOffers(a: ComparableOffer, b: ComparableOffer): number {
   const scoreA = costScoreMicros(a);
   const scoreB = costScoreMicros(b);
   if (scoreA !== null && scoreB !== null && scoreA !== scoreB) return scoreA - scoreB;
