@@ -214,7 +214,11 @@ Credentials, ingress configuration and operator procedures are intentionally not
 ## License
 
 [AGPL-3.0](LICENSE). If you run a modified version as a network service, you must offer
-its source to your users.
+its source to your users. Material that is not ours to license — the provider page excerpts
+used as test fixtures, and the font — is listed in
+[`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+
+Running your own instance? Replace or remove the referral links in `src/lib/referrals.ts`.
 
 ## Stack
 
