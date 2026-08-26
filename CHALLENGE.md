@@ -6,12 +6,27 @@ only on what was added after the start.
 
 **Submission Period opened:** 2026-08-25, 11:00 PT — `2026-08-25T18:00:00Z`.
 
-This repository's commit history is the evidence, and it is genuine: author and commit
-dates are the original ones. Verify the boundary yourself with:
+This repository's commit history is the evidence. Verify the boundary yourself:
 
 ```bash
 git log --date=iso-strict --pretty='%h %ad %s' --since=2026-08-25T18:00:00Z
 ```
+
+### About this history
+
+This is a **sanitized filtered copy** of a private working repository. The development is
+real and so are the dates; what was removed was operational material that has no place in a
+public repository. Commits containing no public product material were omitted.
+
+- **Author and commit dates are the originals.** Nothing is backdated or invented.
+- **Commit order and evidence-bearing subjects are preserved.** Sensitive message bodies are omitted.
+- **Commit hashes differ from the private repository**, because filtering rewrites them.
+  Nothing here cites a hash from the private repository as evidence; the boundary is
+  identified by commit subject and UTC date, which survive filtering and are what the
+  command above prints.
+- **Commits that contained only non-public material are gone**, so the history is shorter
+  than the private one.
+- **Author and committer email is normalised** to the maintainer's GitHub noreply address.
 
 ## Prior work — before the Submission Period
 
@@ -63,11 +78,36 @@ data a human reads instead of scraping the DOM:
 
 Design notes and prompts to try: [Agent tools (WebMCP)](README.md#agent-tools-webmcp).
 
-## Live
+## Try it — live
 
-<https://ai-prices.oxweb.xyz>
+**<https://ai-prices.oxweb.xyz>**
 
-The maintainer has tested all five tools end to end in the ChatGPT in-app browser against
-production: discovered, invoked, real pricing returned, providers and models compared,
-workload costs calculated, and page state changed via `show_ai_prices_in_page`. The
-submission's demo video is the record of that run — this file is not evidence of it.
+Open that URL in **ChatGPT's in-app browser**, which supports WebMCP out of the box, or in
+Chrome/Edge with the WebMCP origin trial enabled. The page registers its five tools on load;
+no sign-in, no key, nothing to configure.
+
+Then ask, in order — this is the whole loop in three turns:
+
+1. **"Find GPT-5.6 Sol and show me its cheapest providers."**
+   → `search_ai_model_prices`, then `compare_ai_model_providers`. Returns a ranked provider
+   table with savings against OpenAI's own published price, and the timestamp the prices
+   were observed.
+2. **"Compare Claude Opus 5 and GPT-5.6 Sol for 50 million input and 10 million output
+   tokens."**
+   → `compare_ai_models` with the workload. Exact USD totals, computed in integer micro-USD
+   from live scraped prices, with the cheaper model and provider named.
+3. **"Put GPT-5.6 Sol on the page so I can keep browsing."**
+   → `show_ai_prices_in_page`. The page underneath the conversation changes to that
+   comparison, so the human carries on from where the agent got to.
+
+Two more worth trying:
+
+- "Which provider is cheapest for that workload, and how far below the official price?"
+- "Show me Anthropic models where some provider charges under $1 per million input tokens."
+
+A plain browser with no WebMCP support gets the ordinary site, unchanged — the integration
+is feature-detected and adds no markup.
+
+The maintainer has run all five tools end to end in the ChatGPT in-app browser against
+production. The submission's demo video is the record of that run; this file is not
+evidence of it.
