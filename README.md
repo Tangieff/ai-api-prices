@@ -5,8 +5,11 @@ A fast public comparison of what discount inference providers charge for popular
 Search a model, see every provider's published input/output price per million tokens sorted
 cheapest first, and go straight to the provider.
 
-Repository: `Tangieff/ai-api-prices`
+**Live: <https://ai-prices.oxweb.xyz>**
 
+In a WebMCP-capable browser the same data is available to an AI agent as five callable
+tools — see [Agent tools (WebMCP)](#agent-tools-webmcp). What was built for the OpenAI
+WebMCP Challenge, and when, is set out in [`CHALLENGE.md`](CHALLENGE.md).
 
 ---
 
@@ -207,6 +210,11 @@ docker compose --profile refresh run --rm refresh
 ```
 
 Credentials, ingress configuration and operator procedures are intentionally not stored here.
+
+## License
+
+[AGPL-3.0](LICENSE). If you run a modified version as a network service, you must offer
+its source to your users.
 
 ## Stack
 
