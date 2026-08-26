@@ -1,11 +1,14 @@
 'use client';
 
-import { useDeferredValue, useId, useMemo, useState } from 'react';
+import { useCallback, useDeferredValue, useId, useMemo, useState } from 'react';
 import { pickFeaturedModels } from '@/lib/featured-models';
 import { buildProviderSummaries } from '@/lib/provider-summaries';
 import { matches } from '@/lib/search';
+import type { PriceIndex } from '@/lib/webmcp/catalog';
+import type { ShowInPageRequest } from '@/lib/webmcp/tools';
 import type { ModelView, ProviderRef } from '@/lib/view';
 import { ModelCard } from './ModelCard';
+import { WebMcpTools } from './WebMcpTools';
 import { pluralise, updatedLabel, utcStamp } from './format';
 import { useClock } from './useClock';
 import styles from './discovery.module.css';
@@ -38,6 +41,8 @@ interface PriceExplorerProps {
   totalOffers: number;
   providerCount: number;
   providersWithPrices: number;
+  /** UTC instant of the price snapshot, reported by the WebMCP tools with every quote. */
+  generatedAt: string | null;
 }
 
 export function PriceExplorer({
@@ -46,6 +51,7 @@ export function PriceExplorer({
   totalOffers,
   providerCount,
   providersWithPrices,
+  generatedAt,
 }: PriceExplorerProps) {
   const [query, setQuery] = useState('');
   const [view, setView] = useState<'models' | 'providers'>('models');
@@ -88,8 +94,24 @@ export function PriceExplorer({
     setQuery(queryValue);
   };
 
+  // Drives the two controls a human already uses, so an agent can hand the page
+  // back in the state the conversation reached. Stable identity keeps the WebMCP
+  // effect from re-registering its tools on every render.
+  const showInPage = useCallback(({ query: nextQuery, view: nextView }: ShowInPageRequest) => {
+    setView(nextView);
+    setQuery(nextQuery);
+  }, []);
+
+  // Only what the tools read. `provider_status` stays on the server: its
+  // `error` strings are scraper diagnostics, not something to ship to browsers.
+  const priceIndex: PriceIndex = useMemo(
+    () => ({ models, providers, generated_at: generatedAt }),
+    [models, providers, generatedAt],
+  );
+
   return (
     <>
+      <WebMcpTools index={priceIndex} showInPage={showInPage} />
       <div className="hero">
         <div className="shell">
           <p className="eyebrow">AI inference price index</p>

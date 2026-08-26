@@ -50,6 +50,7 @@ export default async function HomePage() {
         <PriceExplorer
           models={data.models}
           providers={data.providers}
+          generatedAt={data.generated_at}
           totalOffers={data.total_offers}
           providerCount={data.provider_status.length}
           providersWithPrices={

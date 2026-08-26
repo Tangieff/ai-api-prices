@@ -130,6 +130,49 @@ Nothing else needs to change: model grouping, discounts, sorting and rendering a
 - **Referral links.** Each provider has an optional `affiliate_url`; `Visit` uses
   `affiliate_url ?? website_url`. All five are currently `null`, so links go to the provider site.
 
+## Agent tools (WebMCP)
+
+In a browser that supports [WebMCP](https://github.com/webmachinelearning/webmcp) — currently the
+ChatGPT in-app browser, and Chrome/Edge behind the origin trial — the homepage registers five tools
+on `document.modelContext`, so an AI agent can query the same normalised data a human reads instead
+of scraping the DOM.
+
+| Tool | Answers |
+| --- | --- |
+| `search_ai_model_prices` | "find model X", "which models are under $1 per million input tokens" |
+| `compare_ai_model_providers` | "who is cheapest for GPT-5.6 Sol", "show me every provider for X" |
+| `estimate_ai_workload_cost` | "what would 50M in and 10M out cost, and where is it cheapest" |
+| `compare_ai_models` | "is Claude Opus 5 or GPT-5.6 Sol cheaper, for this workload" |
+| `show_ai_prices_in_page` | leaves the answer on screen so the human can carry on browsing |
+
+Try, in the ChatGPT in-app browser on <https://ai-prices.oxweb.xyz>:
+
+1. `Find GPT-5.6 Sol and show me its cheapest providers.`
+2. `Compare Claude Opus 5 and GPT-5.6 Sol for 50 million input and 10 million output tokens.`
+3. `Which provider is cheapest for that workload, and how much is that off the official price?`
+4. `Show me Anthropic models where some provider charges under $1 per million input tokens.`
+5. `Put GPT-5.6 Sol on the page so I can keep browsing from there.`
+
+Notes:
+
+- **Progressive enhancement.** Everything is feature-detected. In a browser without WebMCP the
+  component renders nothing and the site behaves exactly as before; there is no SSR or hydration
+  effect either way.
+- **One source of truth.** The tools reuse `buildPageData`, `lib/search`, `lib/score` and
+  `lib/money`, so an agent cannot be told a different price from the one on screen. Providers whose
+  last refresh failed are excluded by default and can never be reported as cheapest.
+- **Exact money.** Workload costs are computed in integer micro-USD via BigInt, because
+  `price_per_1m × tokens` overflows a double well before the token cap. Input and output are rounded
+  separately so the published parts add up to the published total exactly.
+- **Read-mostly and bounded.** Four tools are `readOnlyHint`; all four are `untrustedContentHint`,
+  because provider prices are scraped third-party text. `show_ai_prices_in_page` can only set the
+  existing search string and switch between the Models and Providers tabs — it cannot navigate.
+- **Not a filter we can offer:** minimum context length. The dataset carries no context-window
+  field, and inventing one would answer the question wrongly.
+
+Implementation: `src/lib/webmcp/` (types, catalog, tools, registration) and
+`src/app/components/WebMcpTools.tsx`. Tests: `tests/webmcp-*.test.ts`.
+
 ## Project layout
 
 ```
@@ -137,6 +180,7 @@ data/prices.json              generated dataset (committed)
 scripts/refresh-prices.ts     the refresh command
 src/adapters/                 one small independent adapter per provider
 src/lib/                      money, models, search, scoring, dataset, view model
+src/lib/webmcp/               WebMCP tool surface for AI agents
 src/refresh/run.ts            concurrent refresh with per-provider isolation
 src/app/                      Next.js App Router page and components
 tests/                        unit and parser tests, with captured fixtures
