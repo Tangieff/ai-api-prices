@@ -34,9 +34,13 @@ The price-comparison product: 18 provider adapters, canonical model and price
 normalisation, the ranking rule, official-price baselines, the homepage, the model pages,
 the JSON feed, and the deployment.
 
-The last commit before the Submission Period opened is
+The last commit before the Submission Period opened that survives in this history is
+`Merge pull request #31 from Tangieff/audit/comprehensive-pricing-2026-08-24`, dated
+**2026-08-24T17:26:14Z**. Everything at or before it is prior work and is not offered as
+challenge work.
 
-at or before it is prior work and is not offered as challenge work.
+An additional pre-period commit contained no public product material and was omitted. No product code changed in the resulting gap.
+
 
 ## Challenge work — during the Submission Period
 
@@ -44,7 +48,7 @@ at or before it is prior work and is not offered as challenge work.
 `feat: expose the price index to AI agents over WebMCP`, dated **2026-08-26T13:48:30Z** and
 merged the same day — about 20 hours after the period opened.
 
-That change is 13 files, +2431/−2 lines:
+That change is 14 files, +2475/−2 lines — check it with `git show --stat` on that commit:
 
 ```
 src/lib/webmcp/types.ts              WebMCP typings + feature detection
@@ -55,7 +59,9 @@ src/app/components/WebMcpTools.tsx   client component, renders null
 src/app/components/PriceExplorer.tsx integration point
 src/app/page.tsx                     passes the snapshot timestamp
 src/lib/score.ts                     comparator widened so the tools reuse it
-tests/webmcp-*.test.ts (5 files)     85 tests
+tests/webmcp-fixture.ts              shared test catalogue
+tests/webmcp-*.test.ts (4 files)     85 tests
+README.md                            the Agent tools section
 ```
 
 Two other things also happened during the period and are **not** part of the submitted
