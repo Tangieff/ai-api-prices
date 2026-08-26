@@ -20,8 +20,8 @@ describe('model discovery pages', () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
-    expect(urls[0]).toBe('https://prices.oxweb.xyz/');
-    expect(urls).toContain('https://prices.oxweb.xyz/models/claude-opus-5');
+    expect(urls[0]).toBe('https://ai-prices.oxweb.xyz/');
+    expect(urls).toContain('https://ai-prices.oxweb.xyz/models/claude-opus-5');
     expect(urls.length).toBeGreaterThan(100);
   });
 });

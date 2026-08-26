@@ -7,7 +7,7 @@ import type { Adapter, RawOffer } from './types';
  * Boundless API — full public catalogue parser.
  *
  * `/en/models.html` lists every catalogued model together with its Boundless,
- * official and OpenRouter rates plus a lifecycle status. OXWeb Prices only
+ * official and OpenRouter rates plus a lifecycle status. AI API Prices only
  * publishes rows whose status is `Live`; "Coming soon" prices are useful
  * product metadata but are not offers a visitor can actually buy yet.
  *

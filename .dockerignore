@@ -1,4 +1,4 @@
-# Build context for the OXWeb Prices image.
+# Build context for the AI API Prices image.
 #
 # Keep this tight: everything listed here is either rebuilt inside the image,
 # irrelevant to it, or must never reach an image layer at all.

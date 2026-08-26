@@ -6,7 +6,7 @@ export function SiteFooter({ generatedAt }: { generatedAt: string | null }) {
     <footer className="site-footer">
       <div className="shell">
         <p className="colophon">
-          OXWeb Prices &middot; prices last refreshed{' '}
+          AI API Prices &middot; prices last refreshed{' '}
           {generatedAt ? <time dateTime={generatedAt}>{utcStamp(generatedAt)}</time> : 'never'}
         </p>
       </div>

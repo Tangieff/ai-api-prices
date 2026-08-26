@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-# OXWeb Prices — production image.
+# AI API Prices — production image.
 #
 # Two things are built from one dependency tree:
 #

@@ -2,7 +2,7 @@
   "name": "oxweb-prices",
   "version": "0.1.0",
   "private": true,
-  "description": "OXWeb Prices — AI inference price comparison across discount providers.",
+  "description": "AI API Prices — AI inference price comparison across discount providers.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

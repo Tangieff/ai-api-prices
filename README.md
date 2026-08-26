@@ -1,4 +1,4 @@
-# OXWeb Prices
+# AI API Prices
 
 A fast public comparison of what discount inference providers charge for popular AI models.
 
@@ -6,6 +6,7 @@ Search a model, see every provider's published input/output price per million to
 cheapest first, and go straight to the provider.
 
 Repository: `Tangieff/ai-api-prices`
+
 
 ---
 

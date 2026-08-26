@@ -1,10 +1,10 @@
-# OXWeb Prices
+# AI API Prices
 
 > Independent AI inference price index for comparing discounted API and relay providers.
 
-Canonical site: https://prices.oxweb.xyz/
-Machine-readable prices: https://prices.oxweb.xyz/api/prices.json
-Model detail pages: https://prices.oxweb.xyz/models/<canonical-model-id>
+Canonical site: https://ai-prices.oxweb.xyz/
+Machine-readable prices: https://ai-prices.oxweb.xyz/api/prices.json
+Model detail pages: https://ai-prices.oxweb.xyz/models/<canonical-model-id>
 
 ## What this product does
 
@@ -19,7 +19,7 @@ Model detail pages: https://prices.oxweb.xyz/models/<canonical-model-id>
 
 ## Product boundaries
 
-OXWeb Prices is a comparison utility, not an inference gateway. It does not route model requests, hold user balances or resell tokens.
+AI API Prices is a comparison utility, not an inference gateway. It does not route model requests, hold user balances or resell tokens.
 
 The homepage intentionally features only current high-interest models; the full collected catalogue remains searchable and is available in the JSON feed.
 
