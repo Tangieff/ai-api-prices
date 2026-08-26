@@ -1,5 +1,5 @@
 /**
- * Core data shapes for OXWeb Prices.
+ * Core data shapes for AI API Prices.
  *
  * Everything is deliberately flat and JSON-serialisable: the whole dataset is a
  * single generated file that the site reads at render time.

@@ -1,4 +1,4 @@
-# MVP Spec — OXWeb Prices
+# MVP Spec — AI API Prices
 
 ## One-sentence product
 
@@ -11,7 +11,7 @@ The MVP is deliberately small. It should be publishable with five providers and 
 ## Page structure
 
 ### Header
-- OXWeb Prices wordmark
+- AI API Prices wordmark
 - small link back to OXWeb placeholder/configurable URL
 
 ### Intro

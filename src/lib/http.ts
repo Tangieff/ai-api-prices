@@ -9,7 +9,7 @@
 const DEFAULT_TIMEOUT_MS = 20_000;
 
 const USER_AGENT =
-  'OXWebPrices/0.1 (+https://prices.oxweb.xyz; public price comparison; contact via repository)';
+  'AIAPIPrices/0.1 (+https://ai-prices.oxweb.xyz; public price comparison; contact via repository)';
 
 export interface FetchOptions {
   timeoutMs?: number;

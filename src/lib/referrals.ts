@@ -1,5 +1,5 @@
 /**
- * Canonical OXWeb Prices referral destinations.
+ * Canonical AI API Prices referral destinations.
  *
  * Keep referral configuration separate from provider ingestion so links can be
  * recorded before a provider is integrated. Referral status must never affect

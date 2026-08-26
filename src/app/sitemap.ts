@@ -1,8 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { loadDataset } from '@/lib/dataset';
+import { SITE } from '@/lib/site';
 import { buildPageData } from '@/lib/view';
-
-const SITE_URL = 'https://prices.oxweb.xyz';
 
 export const revalidate = 300;
 
@@ -12,13 +11,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      url: `${SITE_URL}/`,
+      url: `${SITE.url}/`,
       lastModified,
       changeFrequency: 'hourly',
       priority: 1,
     },
     ...data.models.map((model) => ({
-      url: `${SITE_URL}/models/${encodeURIComponent(model.id)}`,
+      url: `${SITE.url}/models/${encodeURIComponent(model.id)}`,
       lastModified,
       changeFrequency: 'hourly' as const,
       priority: 0.8,
