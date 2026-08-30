@@ -1,5 +1,9 @@
 # Initial Provider Seed
 
+> Historical planning record: this seed preserves the original MVP candidates. It is not the
+> current active-provider list; see the provider table in `README.md` and the canonical registry in
+> `src/lib/providers.ts` for the current curated six-provider product.
+
 Use these five providers for MVP launch coverage. This is a product seed, not a completeness claim.
 
 ## 1. Surplus Intelligence

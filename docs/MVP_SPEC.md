@@ -1,5 +1,9 @@
 # MVP Spec — AI API Prices
 
+> Historical planning record: this file preserves the original five-provider MVP scope. It is not
+> the current active-provider specification; see the provider table in `README.md` and the
+> canonical registry in `src/lib/providers.ts` for the current curated six-provider product.
+
 ## One-sentence product
 
 A fast public comparison page showing where popular AI models are currently offered and at what published price across discount inference providers.
