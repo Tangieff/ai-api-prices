@@ -1,9 +1,10 @@
 # AI API Prices
 
-A fast public comparison of what discount inference providers charge for popular AI models.
+A live AI inference price index for humans and agents.
 
-Search a model, see every provider's published input/output price per million tokens sorted
-cheapest first, and go straight to the provider.
+Humans can search a model, compare every active provider's published input/output price per
+million tokens and go straight to the provider. In a WebMCP-capable browser, an AI agent can
+search, compare and cost workloads against the same normalized catalogue.
 
 **Live: <https://ai-prices.oxweb.xyz>**
 
@@ -18,13 +19,14 @@ WebMCP Challenge, and when, is set out in [`CHALLENGE.md`](CHALLENGE.md).
 Requires Node.js 20.9+ (developed on Node 22).
 
 ```bash
-npm install          # install dependencies
+npm ci               # install the locked dependencies
 npm run refresh-prices   # optional: fetch current prices (a dataset is committed)
 npm run dev
 ```
 
-A generated dataset is committed at `data/prices.json`, so a fresh clone renders real prices
-without running a refresh first.
+A fresh point-in-time dataset is committed at `data/prices.json`, so a new clone renders the
+current six-provider product without running a refresh first. Its `generated_at` value records
+exactly when that public snapshot was observed.
 
 ## Commands
 
@@ -57,15 +59,16 @@ Each provider is read by its own adapter, concurrently and in isolation. Output 
 ```
 Refreshing provider prices…
 
-  ok    surplus-intelligence: 181 offers
-  ok    derouter: 12 offers
-  ok    clawhive: 5 offers
-  ok    worldgate: 26 offers
-  ok    getgoapi: 116 offers
+  ok    surplus-intelligence: … offers
+  ok    cometapi: … offers
+  ok    relayrouter: … offers
+  ok    tokenmix: … offers
+  ok    relaygpu: … offers
+  ok    midrelay: … offers
 
-Wrote 340 offers across 259 models
+Wrote … offers across … models
   -> /path/to/data/prices.json
-  5/5 providers ok in 2.0s
+  6/6 providers ok in …s
 ```
 
 Exit codes: `0` all providers succeeded · `1` at least one adapter failed (the dataset is still
@@ -86,31 +89,28 @@ rebuild, app restart or manual browser reload.
 | Provider | Source | Adapter |
 | --- | --- | --- |
 | [Surplus Intelligence](https://www.surplusintelligence.ai/) | `api.surplusintelligence.ai/api/markets` | Public marketplace API |
-| [derouter.ai](https://derouter.ai/) | `derouter.ai/pricing` | Public pricing page parser |
-| [ClawHive](https://clawhive.io/) | `clawhive.io/` | Public homepage parser |
-| [WorldGate](https://worldgateapi.com/) | `worldgateapi.com/` | Public homepage parser |
-| [GetGoAPI](https://getgoapi.com/) | `getgoapi.com/en/models` | Public catalogue parser |
+| [CometAPI](https://www.cometapi.com/) | `cometapi.com/pricing/` | Public pricing-page parser |
+| [MidRelay](https://midrelay.com/en) | `midrelay.com/en` | Public pricing-page parser |
+| [TokenMix](https://tokenmix.ai/) | `api.tokenmix.ai/api/models` | Public paginated catalogue API |
+| [RelayRouter](https://relayrouter.io/) | `relayrouter.io/models` | Public catalogue parser; explicit USD direct routes only |
+| [RelayGPU](https://relaygpu.com/) | `relaygpu.com/pricing` | Public pricing-page parser |
 
-All five are read from live public sources; none of them needs credentials.
-
-WorldGate replaced ClaudeAPI.cheap in the launch set. `claudeapi.cheap` is a registered domain that
-publishes no A, AAAA or CNAME record on either Google or Cloudflare public DNS, so it has no
-reachable pricing page and could only ever have been a hand-maintained seed.
-
-WorldGate's price cells carry the canonical USD figure in a `data-price-usd` attribute and a
-rendered text price beside it. The adapter reads the attribute: the page's own script rewrites that
-text on load, both to convert into the visitor's billing currency and because the server-rendered
-text can lag the attribute.
+These six curated active providers are read from live public sources and need no credentials. The
+implemented adapters for earlier providers remain in the codebase as inactive history, but they do
+not run, contribute rows or appear in public readouts. `src/lib/providers.ts` is the canonical
+active registry and controls the refresh set.
 
 ## Adding a provider
 
 1. Write `src/adapters/<provider>.ts` exporting an `Adapter` — a pure `parse*` function plus a thin
    fetch wrapper, so the parser can be tested against a captured fixture.
-2. Add the provider to `PROVIDERS` in `src/lib/providers.ts`.
-3. Register the adapter in `src/adapters/index.ts`.
+2. Add the implementation to `ALL_ADAPTERS` in `src/adapters/index.ts`.
+3. Add the provider to `PROVIDERS` in `src/lib/providers.ts` only when it should become active.
 4. Add a fixture under `tests/fixtures/` and a parser test.
 
-Nothing else needs to change: model grouping, discounts, sorting and rendering are shared.
+`ADAPTERS` is derived from the active provider registry, so an implemented inactive adapter cannot
+silently enter refreshes or public output. Model grouping, discounts, sorting and rendering remain
+shared.
 
 ## How prices are compared
 
@@ -123,6 +123,15 @@ Nothing else needs to change: model grouping, discounts, sorting and rendering a
   reference fields remain diagnostic source data but do not control the public percentage. When a
   model or special tier has no like-for-like official baseline, the UI shows an explained `—`;
   prices at or above official never produce a saving badge.
+- **Separate inputs.** Provider adapters ingest the prices sellers publish. The independent
+  `src/lib/official-prices.ts` registry contains model-maker baselines. Provider ingestion never
+  creates or overrides an official baseline, and a provider's own reference field cannot create a
+  public saving badge.
+- **Featured models.** The broader normalized catalogue stays searchable. The default homepage
+  shows at most six curated candidates and requires at least one active, fresh offer with complete
+  input/output prices and a real saving against a comparable official baseline. It prefers models
+  with qualifying offers from two or more providers and falls back through a deterministic curated
+  list rather than weakening the gate.
 - **Model grouping.** Providers spell the same model differently (`claude-opus-4.5`,
   `claude-opus-4-5-20251101`, `Claude Opus 4.5`). `src/lib/models.ts` folds these onto one slug by
   stripping vendor prefixes and date stamps and normalising version separators. Reasoning-effort
@@ -131,7 +140,8 @@ Nothing else needs to change: model grouping, discounts, sorting and rendering a
 - **Money.** All arithmetic runs in integer micro-USD (`src/lib/money.ts`) so comparisons and
   percentages do not drift. All timestamps are UTC.
 - **Referral links.** Each provider has an optional `affiliate_url`; `Visit` uses
-  `affiliate_url ?? website_url`. All five are currently `null`, so links go to the provider site.
+  `affiliate_url ?? website_url`. Referral destinations are separate from ingestion and never
+  affect ranking, cheapest flags, activation or visibility.
 
 ## Agent tools (WebMCP)
 
@@ -182,6 +192,7 @@ Implementation: `src/lib/webmcp/` (types, catalog, tools, registration) and
 data/prices.json              generated dataset (committed)
 scripts/refresh-prices.ts     the refresh command
 src/adapters/                 one small independent adapter per provider
+src/lib/providers.ts          canonical active-provider registry
 src/lib/                      money, models, search, scoring, dataset, view model
 src/lib/webmcp/               WebMCP tool surface for AI agents
 src/refresh/run.ts            concurrent refresh with per-provider isolation

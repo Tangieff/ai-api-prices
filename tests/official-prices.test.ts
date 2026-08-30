@@ -56,19 +56,14 @@ function pageData(offers: Offer[], now: Date = new Date(observedAt)) {
 }
 
 describe('official model-maker price baselines', () => {
-  it('covers every safely comparable featured model with current first-party provenance', () => {
-    const unavailableFeatured = new Set(['gemini-3.1-pro', 'deepseek-v4-pro']);
+  it('covers every curated featured candidate with current first-party provenance', () => {
     expect(OFFICIAL_PRICE_BASELINES.size).toBeGreaterThan(FEATURED_MODEL_IDS.length);
-    for (const id of FEATURED_MODEL_IDS.filter((modelId) => !unavailableFeatured.has(modelId))) {
+    for (const id of FEATURED_MODEL_IDS) {
       const baseline = OFFICIAL_PRICE_BASELINES.get(id);
       expect(baseline, id).toBeDefined();
       expect(baseline?.source_url).toMatch(/^https:\/\//);
       expect(baseline?.verified_at).toBe('2026-08-24');
       expect(baseline?.note.length).toBeGreaterThan(10);
-    }
-    for (const id of unavailableFeatured) {
-      expect(OFFICIAL_PRICE_BASELINES.has(id)).toBe(false);
-      expect(officialPriceComparison({ model_id: id, tier: null }).comparable).toBe(false);
     }
   });
 
@@ -110,7 +105,7 @@ describe('official model-maker price baselines', () => {
 
     const data = pageData(
       [
-        offer('worldgate', {
+        offer('midrelay', {
           model_id: 'gpt-5.6-sol',
           input_usd_per_1m: 1,
           output_usd_per_1m: 5,
@@ -161,8 +156,8 @@ describe('official model-maker price baselines', () => {
 
   it('uses one official baseline even when provider reference fields differ or are null', () => {
     const data = pageData([
-      offer('worldgate'),
-      offer('frugalrelay', {
+      offer('midrelay'),
+      offer('cometapi', {
         reference_input_usd_per_1m: 10,
         reference_output_usd_per_1m: 50,
         discount_pct: 90,
@@ -177,7 +172,7 @@ describe('official model-maker price baselines', () => {
   });
 
   it('shows an explicit unavailable state when no official baseline exists', () => {
-    const data = pageData([offer('worldgate', { model_id: 'unknown-model' })]);
+    const data = pageData([offer('midrelay', { model_id: 'unknown-model' })]);
     expect(data.models[0]!.offers[0]).toMatchObject({
       discount_pct: null,
       discount_unavailable_reason: 'Official comparable baseline unavailable',
@@ -186,8 +181,8 @@ describe('official model-maker price baselines', () => {
 
   it('does not fabricate a saving at or above official price', () => {
     const data = pageData([
-      offer('worldgate', { input_usd_per_1m: 5, output_usd_per_1m: 25 }),
-      offer('frugalrelay', { input_usd_per_1m: 6, output_usd_per_1m: 30 }),
+      offer('midrelay', { input_usd_per_1m: 5, output_usd_per_1m: 25 }),
+      offer('cometapi', { input_usd_per_1m: 6, output_usd_per_1m: 30 }),
     ]);
     for (const item of data.models[0]!.offers) {
       expect(item.discount_pct).toBeNull();
@@ -201,7 +196,7 @@ describe('official model-maker price baselines', () => {
     expect(comparison.comparable).toBe(false);
     expect(comparison.unavailable_reason).toContain('for this tier');
 
-    const data = pageData([offer('worldgate', { tier: 'Claude / direct · batch' })]);
+    const data = pageData([offer('midrelay', { tier: 'Claude / direct · batch' })]);
     expect(data.models[0]!.offers[0]!.discount_pct).toBeNull();
   });
 });

@@ -19,6 +19,15 @@ const EXPECTED_REFERRALS = {
 } as const;
 
 describe('provider affiliate destinations', () => {
+  const activeProviderIds = [
+    'cometapi',
+    'midrelay',
+    'relaygpu',
+    'relayrouter',
+    'surplus-intelligence',
+    'tokenmix',
+  ];
+
   it('stores the full supplied referral list verbatim', () => {
     expect(REFERRAL_URLS).toEqual(EXPECTED_REFERRALS);
     for (const [id, url] of Object.entries(EXPECTED_REFERRALS)) {
@@ -27,7 +36,7 @@ describe('provider affiliate destinations', () => {
   });
 
   it('routes integrated providers through a referral when one is registered', () => {
-    expect(PROVIDERS_BY_ID.size).toBe(18);
+    expect([...PROVIDERS_BY_ID.keys()].sort()).toEqual(activeProviderIds);
     for (const provider of PROVIDERS_BY_ID.values()) {
       const expected = EXPECTED_REFERRALS[provider.id as keyof typeof EXPECTED_REFERRALS];
       expect(provider.affiliate_url).toBe(expected ?? null);
@@ -35,11 +44,9 @@ describe('provider affiliate destinations', () => {
     }
   });
 
-  it('uses the relay.fast referral for provider-name and Visit destinations', () => {
-    const provider = PROVIDERS_BY_ID.get('relay-fast');
-    expect(provider).toBeDefined();
-    expect(provider?.affiliate_url).toBe('https://relay.fast/sign-up?aff=H9hI');
-    expect(provider && visitUrl(provider)).toBe('https://relay.fast/sign-up?aff=H9hI');
+  it('retains an inactive provider referral without activating the provider', () => {
+    expect(referralUrl('relay-fast')).toBe('https://relay.fast/sign-up?aff=H9hI');
+    expect(PROVIDERS_BY_ID.has('relay-fast')).toBe(false);
   });
 
   it('keeps future-provider referrals without activating those providers prematurely', () => {

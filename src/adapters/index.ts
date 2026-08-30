@@ -1,4 +1,5 @@
 import type { Adapter } from './types';
+import { PROVIDERS } from '@/lib/providers';
 import { surplusIntelligenceAdapter } from './surplus-intelligence';
 import { derouterAdapter } from './derouter';
 import { worldgateAdapter } from './worldgate';
@@ -18,11 +19,8 @@ import { midrelayAdapter } from './midrelay';
 import { zrelayAdapter } from './zrelay';
 import { relayFastAdapter } from './relay-fast';
 
-/**
- * Every provider adapter in the refresh set. New providers stay isolated in one
- * file and are registered here plus `lib/providers.ts`.
- */
-export const ADAPTERS: Adapter[] = [
+/** Every implemented adapter, including providers retained as inactive history. */
+const ALL_ADAPTERS: Adapter[] = [
   surplusIntelligenceAdapter,
   derouterAdapter,
   worldgateAdapter,
@@ -42,5 +40,20 @@ export const ADAPTERS: Adapter[] = [
   zrelayAdapter,
   relayFastAdapter,
 ];
+
+const ADAPTERS_BY_PROVIDER_ID = new Map(
+  ALL_ADAPTERS.map((adapter) => [adapter.provider_id, adapter]),
+);
+
+/**
+ * The canonical provider registry controls the live refresh set. Keeping an
+ * adapter implemented does not activate its provider or let its rows enter the
+ * generated dataset.
+ */
+export const ADAPTERS: Adapter[] = PROVIDERS.map((provider) => {
+  const adapter = ADAPTERS_BY_PROVIDER_ID.get(provider.id);
+  if (!adapter) throw new Error(`No adapter registered for active provider ${provider.id}`);
+  return adapter;
+});
 
 export type { Adapter, RawOffer } from './types';
