@@ -30,7 +30,7 @@ function failingAdapter(providerId: string, message: string): Adapter {
 
 const at = (iso: string) => () => new Date(iso);
 
-const opusFromDerouter: RawOffer = {
+const opusFromCometapi: RawOffer = {
   provider_model_id: 'Claude Opus 4.8',
   display_name: 'Claude Opus 4.8',
   input_usd_per_1m: 1.16,
@@ -39,7 +39,7 @@ const opusFromDerouter: RawOffer = {
   reference_output_usd_per_1m: 25,
 };
 
-const opusFromWorldgate: RawOffer = {
+const opusFromMidrelay: RawOffer = {
   provider_model_id: 'Claude Opus 4.8',
   input_usd_per_1m: 2.5,
   output_usd_per_1m: 12.5,
@@ -51,8 +51,8 @@ describe('refresh', () => {
   it('groups the same model from different providers under one id', async () => {
     const { dataset } = await refresh({
       adapters: [
-        stubAdapter('derouter', [opusFromDerouter]),
-        stubAdapter('worldgate', [opusFromWorldgate]),
+        stubAdapter('cometapi', [opusFromCometapi]),
+        stubAdapter('midrelay', [opusFromMidrelay]),
       ],
       now: at('2026-08-20T12:00:00.000Z'),
     });
@@ -64,7 +64,7 @@ describe('refresh', () => {
 
   it('computes the discount from each source’s own reference price', async () => {
     const { dataset } = await refresh({
-      adapters: [stubAdapter('derouter', [opusFromDerouter])],
+      adapters: [stubAdapter('cometapi', [opusFromCometapi])],
       now: at('2026-08-20T12:00:00.000Z'),
     });
     expect(dataset.offers[0]!.discount_pct).toBe(76.8);
@@ -73,7 +73,7 @@ describe('refresh', () => {
   it('leaves the discount null when the source publishes no reference', async () => {
     const { dataset } = await refresh({
       adapters: [
-        stubAdapter('getgoapi', [
+        stubAdapter('relayrouter', [
           { provider_model_id: 'claude-opus-4-6', input_usd_per_1m: 4, output_usd_per_1m: 20 },
         ]),
       ],
@@ -85,7 +85,7 @@ describe('refresh', () => {
   it('applies structured effective-cost factors before comparison and discount math', async () => {
     const { dataset } = await refresh({
       adapters: [
-        stubAdapter('worldgate', [
+        stubAdapter('midrelay', [
           {
             provider_model_id: 'claude-opus-5',
             input_usd_per_1m: 5,
@@ -107,19 +107,19 @@ describe('refresh', () => {
 
   it('stamps every offer with the observation time and a source URL', async () => {
     const { dataset } = await refresh({
-      adapters: [stubAdapter('derouter', [opusFromDerouter])],
+      adapters: [stubAdapter('cometapi', [opusFromCometapi])],
       now: at('2026-08-20T12:00:00.000Z'),
     });
     expect(dataset.offers[0]!.observed_at).toBe('2026-08-20T12:00:00.000Z');
-    expect(dataset.offers[0]!.source_url).toBe('https://derouter.ai/pricing');
+    expect(dataset.offers[0]!.source_url).toBe('https://www.cometapi.com/pricing/');
     expect(dataset.offers[0]!.provider_model_id).toBe('Claude Opus 4.8');
   });
 
   it('keeps a failing provider’s previous offers instead of dropping them', async () => {
     const first = await refresh({
       adapters: [
-        stubAdapter('derouter', [opusFromDerouter]),
-        stubAdapter('worldgate', [opusFromWorldgate]),
+        stubAdapter('cometapi', [opusFromCometapi]),
+        stubAdapter('midrelay', [opusFromMidrelay]),
       ],
       now: at('2026-08-20T12:00:00.000Z'),
     });
@@ -127,47 +127,47 @@ describe('refresh', () => {
     const second = await refresh({
       previous: first.dataset,
       adapters: [
-        stubAdapter('derouter', [opusFromDerouter]),
-        failingAdapter('worldgate', 'HTTP 503 Service Unavailable'),
+        stubAdapter('cometapi', [opusFromCometapi]),
+        failingAdapter('midrelay', 'HTTP 503 Service Unavailable'),
       ],
       now: at('2026-08-20T13:00:00.000Z'),
     });
 
     expect(second.dataset.offers).toHaveLength(2);
 
-    const worldgate = second.dataset.provider_status.find((s) => s.provider_id === 'worldgate')!;
-    expect(worldgate.ok).toBe(false);
-    expect(worldgate.stale).toBe(true);
-    expect(worldgate.error).toMatch(/503/);
-    expect(worldgate.last_success_at).toBe('2026-08-20T12:00:00.000Z');
-    const carried = second.dataset.offers.find((o) => o.provider_id === 'worldgate')!;
+    const midrelay = second.dataset.provider_status.find((s) => s.provider_id === 'midrelay')!;
+    expect(midrelay.ok).toBe(false);
+    expect(midrelay.stale).toBe(true);
+    expect(midrelay.error).toMatch(/503/);
+    expect(midrelay.last_success_at).toBe('2026-08-20T12:00:00.000Z');
+    const carried = second.dataset.offers.find((o) => o.provider_id === 'midrelay')!;
     expect(carried.observed_at).toBe('2026-08-20T12:00:00.000Z');
 
-    const derouter = second.dataset.provider_status.find((s) => s.provider_id === 'derouter')!;
-    expect(derouter.ok).toBe(true);
-    expect(derouter.stale).toBe(false);
+    const cometapi = second.dataset.provider_status.find((s) => s.provider_id === 'cometapi')!;
+    expect(cometapi.ok).toBe(true);
+    expect(cometapi.stale).toBe(false);
   });
 
   it('survives an adapter that fails on the very first run', async () => {
     const { dataset } = await refresh({
       adapters: [
-        stubAdapter('derouter', [opusFromDerouter]),
-        failingAdapter('worldgate', 'page layout changed'),
+        stubAdapter('cometapi', [opusFromCometapi]),
+        failingAdapter('midrelay', 'page layout changed'),
       ],
       now: at('2026-08-20T12:00:00.000Z'),
     });
 
     expect(dataset.offers).toHaveLength(1);
-    const worldgate = dataset.provider_status.find((s) => s.provider_id === 'worldgate')!;
-    expect(worldgate).toMatchObject({ ok: false, offer_count: 0, stale: false, last_success_at: null });
+    const midrelay = dataset.provider_status.find((s) => s.provider_id === 'midrelay')!;
+    expect(midrelay).toMatchObject({ ok: false, offer_count: 0, stale: false, last_success_at: null });
   });
 
   it('does not let one adapter’s failure abort the others', async () => {
     const { statuses } = await refresh({
       adapters: [
         failingAdapter('surplus-intelligence', 'boom'),
-        failingAdapter('derouter', 'boom'),
-        stubAdapter('worldgate', [opusFromWorldgate]),
+        failingAdapter('cometapi', 'boom'),
+        stubAdapter('midrelay', [opusFromMidrelay]),
       ],
       now: at('2026-08-20T12:00:00.000Z'),
     });
@@ -178,18 +178,18 @@ describe('refresh', () => {
   it('isolates invalid effective-cost normalization to its provider', async () => {
     const { dataset } = await refresh({
       adapters: [
-        stubAdapter('derouter', [
+        stubAdapter('cometapi', [
           {
-            ...opusFromDerouter,
+            ...opusFromCometapi,
             effective_cost: { route_multiplier: { numerator: 0, denominator: 1 } },
           },
         ]),
-        stubAdapter('worldgate', [opusFromWorldgate]),
+        stubAdapter('midrelay', [opusFromMidrelay]),
       ],
       now: at('2026-08-20T12:00:00.000Z'),
     });
-    expect(dataset.offers.map((offer) => offer.provider_id)).toEqual(['worldgate']);
-    expect(dataset.provider_status.find((status) => status.provider_id === 'derouter')).toMatchObject(
+    expect(dataset.offers.map((offer) => offer.provider_id)).toEqual(['midrelay']);
+    expect(dataset.provider_status.find((status) => status.provider_id === 'cometapi')).toMatchObject(
       { ok: false, stale: false, error: expect.stringMatching(/normalization failed/) },
     );
   });
@@ -198,7 +198,7 @@ describe('refresh', () => {
     let attempts = 0;
     const delays: number[] = [];
     const adapter: Adapter = {
-      provider_id: 'worldgate',
+      provider_id: 'midrelay',
       source_kind: 'html',
       fetchOffers: async () => {
         attempts += 1;
@@ -220,12 +220,12 @@ describe('refresh', () => {
   it('accepts a provider that recovers on its final retry', async () => {
     let attempts = 0;
     const adapter: Adapter = {
-      provider_id: 'worldgate',
+      provider_id: 'midrelay',
       source_kind: 'html',
       fetchOffers: async () => {
         attempts += 1;
         if (attempts < 3) throw new Error('temporary outage');
-        return [opusFromWorldgate];
+        return [opusFromMidrelay];
       },
     };
     const { statuses } = await refresh({
@@ -240,7 +240,7 @@ describe('refresh', () => {
   it('drops a tier row priced identically to the same provider’s base row', async () => {
     const { dataset } = await refresh({
       adapters: [
-        stubAdapter('getgoapi', [
+        stubAdapter('relayrouter', [
           { provider_model_id: 'claude-haiku-4-5', input_usd_per_1m: 0.8, output_usd_per_1m: 4 },
           {
             provider_model_id: 'claude-haiku-4-5-thinking',
@@ -258,7 +258,7 @@ describe('refresh', () => {
   it('keeps a tier row that is genuinely priced differently', async () => {
     const { dataset } = await refresh({
       adapters: [
-        stubAdapter('getgoapi', [
+        stubAdapter('relayrouter', [
           { provider_model_id: 'claude-opus-4-7', input_usd_per_1m: 4, output_usd_per_1m: 20 },
           {
             provider_model_id: 'claude-opus-4-7-thinking',
@@ -274,7 +274,7 @@ describe('refresh', () => {
   });
 
   it('combines an adapter route tier with a model reasoning tier', async () => {
-    const adapter = stubAdapter('derouter', [
+    const adapter = stubAdapter('cometapi', [
       {
         provider_model_id: 'gpt-5.6-sol-thinking',
         input_usd_per_1m: 1,
@@ -294,9 +294,9 @@ describe('buildPageData', () => {
   async function pageData(): Promise<ReturnType<typeof buildPageData>> {
     const { dataset } = await refresh({
       adapters: [
-        stubAdapter('worldgate', [opusFromWorldgate]),
-        stubAdapter('derouter', [opusFromDerouter]),
-        stubAdapter('getgoapi', [
+        stubAdapter('midrelay', [opusFromMidrelay]),
+        stubAdapter('cometapi', [opusFromCometapi]),
+        stubAdapter('relayrouter', [
           { provider_model_id: 'gpt-4o', input_usd_per_1m: 2, output_usd_per_1m: 8 },
         ]),
       ],
@@ -309,7 +309,7 @@ describe('buildPageData', () => {
     const data = await pageData();
     const opus = data.models.find((model) => model.id === 'claude-opus-4.8')!;
     expect(opus.offers.map((offer) => offer.is_best)).toEqual([true, false]);
-    expect(data.providers[opus.offers[0]!.provider_id]!.name).toBe('derouter.ai');
+    expect(data.providers[opus.offers[0]!.provider_id]!.name).toBe('CometAPI');
   });
 
   it('leads with the models comparable across the most providers', async () => {
@@ -321,7 +321,9 @@ describe('buildPageData', () => {
   it('resolves Visit through the configured provider destination', async () => {
     const data = await pageData();
     const offer = data.models[0]!.offers[0]!;
-    expect(data.providers[offer.provider_id]!.visit_url).toBe('https://derouter.ai?ref=mZxRdS1y');
+    expect(data.providers[offer.provider_id]!.visit_url).toBe(
+      'https://www.cometapi.com/console/login?aff=fEWl',
+    );
   });
 
   it('publishes a provider entry for every offer row', async () => {
@@ -335,7 +337,7 @@ describe('buildPageData', () => {
 
   it('makes provider names searchable alongside the model', async () => {
     const data = await pageData();
-    expect(data.models[0]!.search_text).toContain('worldgate');
+    expect(data.models[0]!.search_text).toContain('midrelay');
   });
 
   it('reports an empty dataset without throwing', () => {
@@ -354,14 +356,14 @@ describe('buildPageData', () => {
 
   it('keeps stale offers visible but excludes them from every best-price signal', async () => {
     const first = await refresh({
-      adapters: [stubAdapter('derouter', [opusFromDerouter])],
+      adapters: [stubAdapter('cometapi', [opusFromCometapi])],
       now: at('2026-08-20T12:00:00.000Z'),
     });
     const second = await refresh({
       previous: first.dataset,
       adapters: [
-        failingAdapter('derouter', 'down'),
-        stubAdapter('worldgate', [opusFromWorldgate]),
+        failingAdapter('cometapi', 'down'),
+        stubAdapter('midrelay', [opusFromMidrelay]),
       ],
       now: at('2026-08-20T13:00:00.000Z'),
       sleep: async () => {},
@@ -369,24 +371,24 @@ describe('buildPageData', () => {
     const data = buildPageData(second.dataset);
     const model = data.models[0]!;
     expect(model.offers).toHaveLength(2);
-    expect(model.offers[0]).toMatchObject({ provider_id: 'worldgate', stale: false, is_best: true });
-    expect(model.offers[1]).toMatchObject({ provider_id: 'derouter', stale: true, is_best: false });
+    expect(model.offers[0]).toMatchObject({ provider_id: 'midrelay', stale: false, is_best: true });
+    expect(model.offers[1]).toMatchObject({ provider_id: 'cometapi', stale: true, is_best: false });
     expect(model.best_input_usd_per_1m).toBe(2.5);
     expect(model.best_output_usd_per_1m).toBe(12.5);
     expect(model.best_discount_pct).toBe(50);
     const summaries = buildProviderSummaries(data.models, data.providers);
-    expect(summaries.find((provider) => provider.id === 'worldgate')?.cheapest_count).toBe(1);
-    expect(summaries.find((provider) => provider.id === 'derouter')?.cheapest_count).toBe(0);
+    expect(summaries.find((provider) => provider.id === 'midrelay')?.cheapest_count).toBe(1);
+    expect(summaries.find((provider) => provider.id === 'cometapi')?.cheapest_count).toBe(0);
   });
 
   it('shows an all-stale model without fabricating a cheapest or summary winner', async () => {
     const first = await refresh({
-      adapters: [stubAdapter('derouter', [opusFromDerouter])],
+      adapters: [stubAdapter('cometapi', [opusFromCometapi])],
       now: at('2026-08-20T12:00:00.000Z'),
     });
     const second = await refresh({
       previous: first.dataset,
-      adapters: [failingAdapter('derouter', 'down')],
+      adapters: [failingAdapter('cometapi', 'down')],
       now: at('2026-08-20T13:00:00.000Z'),
       sleep: async () => {},
     });

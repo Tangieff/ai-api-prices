@@ -114,11 +114,12 @@ export function PriceExplorer({
       <WebMcpTools index={priceIndex} showInPage={showInPage} />
       <div className="hero">
         <div className="shell">
-          <p className="eyebrow">AI inference price index</p>
-          <h1>Find the cheapest API for any AI model</h1>
+          <p className="eyebrow">For humans and AI agents</p>
+          <h1>Compare the AI inference market or let your agent do it</h1>
           <p className="hero__lead">
-            Compare GPT, Claude, Grok, Gemini, GLM, DeepSeek and other models across discounted
-            inference providers, normalised to US dollars per million tokens.
+            Fresh, normalized pricing across a curated set of public AI inference providers.
+            Through WebMCP, AI agents can search models, compare providers, calculate real workload
+            costs, and hand the result back to the page.
           </p>
 
           <div className="search">
@@ -133,7 +134,7 @@ export function PriceExplorer({
               placeholder={
                 view === 'models'
                   ? 'Search Claude, GPT, Gemini, DeepSeek…'
-                  : 'Search Surplus, Frugal, WorldGate…'
+                  : 'Search Surplus, CometAPI, TokenMix…'
               }
               autoComplete="off"
               spellCheck={false}
@@ -150,6 +151,11 @@ export function PriceExplorer({
               </button>
             ) : null}
           </div>
+
+          <p className="hint">
+            WebMCP enabled <span className="readout__sep">·</span> Ask your agent: Compare Claude
+            Opus 5 and GPT-5.6 Sol for 50M input + 10M output tokens.
+          </p>
 
           <p className="readout">
             <b>{models.length}</b> models searchable

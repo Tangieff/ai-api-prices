@@ -1,0 +1,35 @@
+/*
+ * AI API Prices is intentionally a light information utility.
+ *
+ * globals.css still contains the historical prefers-color-scheme tokens, but
+ * this file is imported after it so system dark mode cannot turn the public
+ * product into a dark dashboard. Keep the canonical light OX Index palette
+ * here until/unless dark mode becomes an explicit product feature.
+ */
+
+:root {
+  color-scheme: light;
+
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+
+  --ink: #101218;
+  --ink-muted: #5b6270;
+  --ink-faint: #6c7482;
+
+  --rule: #dee2e8;
+  --rule-strong: #c6ccd6;
+
+  --action: #2457e6;
+  --action-hover: #1b45bc;
+  --action-wash: #eef3ff;
+  --action-wash-edge: #d6e2fd;
+  --on-action: #ffffff;
+
+  --save-bg: #fbf0d8;
+  --save-ink: #79500a;
+
+  --alert-bg: #fceee8;
+  --alert-ink: #8a3b21;
+}

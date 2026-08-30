@@ -87,6 +87,11 @@ describe('searchModels', () => {
     expect(result.models[0]?.id).toBe('partial-model');
     expect(result.models[0]?.cheapest).toBeNull();
   });
+
+  it('still finds catalogue models that are not homepage-featured', () => {
+    const result = searchModels(data, { query: 'tiny-model' });
+    expect(result.models.map((model) => model.id)).toEqual(['tiny-model']);
+  });
 });
 
 describe('compareProvidersForModel', () => {

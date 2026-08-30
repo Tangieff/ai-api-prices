@@ -211,11 +211,13 @@ export function buildPageData(dataset: Dataset, now: Date = new Date()): PageDat
     };
   }
 
+  const totalOffers = models.reduce((total, model) => total + model.offers.length, 0);
+
   return {
     models,
     providers,
     provider_status,
-    generated_at: dataset.offers.length > 0 ? dataset.generated_at : null,
-    total_offers: dataset.offers.length,
+    generated_at: totalOffers > 0 ? dataset.generated_at : null,
+    total_offers: totalOffers,
   };
 }

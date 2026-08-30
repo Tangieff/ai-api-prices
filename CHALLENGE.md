@@ -69,6 +69,17 @@ feature: the rename to *AI API Prices* with its hostname cutover, and the open-s
 release work (this file, the licence, third-party notices, and documentation tidying).
 They are listed here so the feature diff above is not read as covering them.
 
+## Subsequent challenge-period product hardening
+
+After the WebMCP tool surface above was built, later product-hardening changes clarified the
+homepage copy so agent use is explicit, curated the active refresh registry to six public-source
+providers, and required homepage-featured models to have usable live input/output pricing plus a
+comparable saving against an official model-maker baseline. The broader catalogue remains
+searchable by people and by the existing WebMCP tools.
+
+These are later product changes. They do not change when the WebMCP feature was implemented, the
+historical boundary above, or the size and contents of the original WebMCP commit.
+
 ## What the WebMCP work does
 
 Five tools registered on `document.modelContext`, so an agent queries the same normalised

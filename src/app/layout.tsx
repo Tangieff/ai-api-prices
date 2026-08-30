@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Instrument_Sans } from 'next/font/google';
 import { SITE } from '@/lib/site';
 import './globals.css';
+import './light-only.css';
 
 /**
  * Typography.

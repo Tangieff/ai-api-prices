@@ -1,15 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import { GET } from '@/app/api/prices.json/route';
 
+const ACTIVE_PROVIDER_IDS = [
+  'cometapi',
+  'midrelay',
+  'relaygpu',
+  'relayrouter',
+  'surplus-intelligence',
+  'tokenmix',
+];
+
 describe('GET /api/prices.json', () => {
   it('publishes the normalized comparison data without internal search blobs', async () => {
     const response = await GET();
     const body = (await response.json()) as {
       schema_version: number;
       price_unit: string;
+      total_offers: number;
       providers: Array<{ id: string; visit_url: string }>;
       models: Array<{
         id: string;
+        offers: Array<{ provider_id: string }>;
         official_baseline: null | { model_id: string; valid_through?: string };
         [key: string]: unknown;
       }>;
@@ -28,7 +39,17 @@ describe('GET /api/prices.json', () => {
       valid_through: '2026-11-21',
     });
 
-    const derouter = body.providers.find((provider) => provider.id === 'derouter');
-    expect(derouter?.visit_url).toBe('https://derouter.ai?ref=mZxRdS1y');
+    expect(body.providers.map((provider) => provider.id).sort()).toEqual(ACTIVE_PROVIDER_IDS);
+    expect(body.total_offers).toBe(
+      body.models.reduce((total, model) => total + model.offers.length, 0),
+    );
+    expect(
+      body.models.flatMap((model) => model.offers).every((offer) =>
+        ACTIVE_PROVIDER_IDS.includes(offer.provider_id),
+      ),
+    ).toBe(true);
+
+    const cometapi = body.providers.find((provider) => provider.id === 'cometapi');
+    expect(cometapi?.visit_url).toBe('https://www.cometapi.com/console/login?aff=fEWl');
   });
 });
