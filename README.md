@@ -19,7 +19,7 @@ WebMCP Challenge, and when, is set out in [`CHALLENGE.md`](CHALLENGE.md).
 Requires Node.js 20.9+ (developed on Node 22).
 
 ```bash
-npm install          # install dependencies
+npm ci               # install the locked dependencies
 npm run refresh-prices   # optional: fetch current prices (a dataset is committed)
 npm run dev
 ```
