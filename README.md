@@ -95,7 +95,7 @@ rebuild, app restart or manual browser reload.
 | [RelayRouter](https://relayrouter.io/) | `relayrouter.io/models` | Public catalogue parser; explicit USD direct routes only |
 | [RelayGPU](https://relaygpu.com/) | `relaygpu.com/pricing` | Public pricing-page parser |
 
-These six active providers are read from live public sources and need no credentials. The
+These six curated active providers are read from live public sources and need no credentials. The
 implemented adapters for earlier providers remain in the codebase as inactive history, but they do
 not run, contribute rows or appear in public readouts. `src/lib/providers.ts` is the canonical
 active registry and controls the refresh set.
