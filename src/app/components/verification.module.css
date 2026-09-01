@@ -1,0 +1,806 @@
+/*
+ * Provider transparency layer.
+ *
+ * Same index grammar as the price tables: hairline rules, tonal surfaces, no
+ * shadow, no gradient, 4px radius, figures aligned. The only new vocabulary is
+ * the evidence chip, and it is deliberately quiet — this surface reports what is
+ * public, so nothing on it should read as a verdict.
+ */
+
+.intro {
+  margin: 0 0 var(--s5);
+}
+
+.introHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s4);
+}
+
+.intro h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.intro p {
+  margin: var(--s2) 0 0;
+  max-width: 62ch;
+  color: var(--ink-muted);
+  font-size: 14px;
+}
+
+/* --------------------------------------------------------- summary cards -- */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  margin: 0 0 var(--s5);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.card {
+  padding: var(--s4);
+  background: var(--surface);
+  /* A hairline in the level colour ties each tile to the chips in the table
+     below it. Kept to the top edge so the tiles stay a distribution, not four
+     coloured status blocks. */
+  box-shadow: inset 0 2px 0 var(--rule-strong);
+}
+
+.card[data-level='high'] {
+  box-shadow: inset 0 2px 0 var(--verify-ok-ink);
+}
+
+.card[data-level='moderate'] {
+  box-shadow: inset 0 2px 0 var(--action);
+}
+
+.card[data-level='limited'] {
+  box-shadow: inset 0 2px 0 var(--verify-gap-ink);
+}
+
+.card[data-level='unverified'] {
+  box-shadow: inset 0 2px 0 var(--verify-idle-ink);
+}
+
+.cardValue {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s1);
+  font-size: 26px;
+  font-weight: 650;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.cardTotal {
+  color: var(--ink-faint);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.cardLabel {
+  margin: var(--s2) 0 0;
+  color: var(--ink-muted);
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+/* -------------------------------------------------------------- filters -- */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin: 0 0 var(--s4);
+}
+
+.filters button {
+  min-height: 30px;
+  padding: 0 var(--s3);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.filters button:hover:not([aria-pressed='true']) {
+  border-color: var(--action);
+  color: var(--action);
+}
+
+.filters button[aria-pressed='true'] {
+  border-color: var(--action);
+  background: var(--action-wash);
+  color: var(--action);
+  font-weight: 600;
+}
+
+.filters button[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.filterCount {
+  margin-left: var(--s1);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+
+/* ---------------------------------------------------------------- chips -- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px var(--s2);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.chip::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+.chip[data-level='high'],
+.chip[data-state='found'] {
+  background: var(--verify-ok-bg);
+  color: var(--verify-ok-ink);
+}
+
+.chip[data-level='moderate'] {
+  background: var(--action-wash);
+  color: var(--action);
+}
+
+.chip[data-level='limited'],
+.chip[data-state='partial'] {
+  background: var(--verify-gap-bg);
+  color: var(--verify-gap-ink);
+}
+
+.chip[data-level='unverified'],
+.chip[data-state='missing'] {
+  background: var(--verify-idle-bg);
+  color: var(--verify-idle-ink);
+}
+
+/* ----------------------------------------------------------------- rows -- */
+
+.nameButton {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nameButton:hover {
+  color: var(--action);
+}
+
+/* The price tables right-align every column because every column is a figure.
+   Here only the last two are, so the text columns go back to a left edge the
+   eye can run down. Scoped above the breakpoint: below it the table is a stack
+   of cards instead. */
+@media (min-width: 981px) {
+  .table th:nth-child(2),
+  .table td:nth-child(2),
+  .table th:nth-child(3),
+  .table td:nth-child(3),
+  .table th:nth-child(4),
+  .table td:nth-child(4) {
+    text-align: left;
+  }
+}
+
+.table tbody tr {
+  cursor: pointer;
+}
+
+.table tbody tr[data-selected='true'] {
+  background: var(--action-wash);
+}
+
+.table tbody tr[data-selected='true'] td:first-child {
+  box-shadow: inset 3px 0 0 var(--action);
+}
+
+.muted {
+  color: var(--ink-faint);
+}
+
+.entityNote {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-muted);
+  font-size: 11.5px;
+}
+
+/* -------------------------------------------------------------- methods -- */
+
+.method {
+  margin: var(--s5) 0 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.method summary {
+  padding: var(--s3) var(--s4);
+  color: var(--action);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.method summary::-webkit-details-marker {
+  display: none;
+}
+
+.method summary::before {
+  content: '+ ';
+  font-weight: 500;
+}
+
+.method[open] summary::before {
+  content: '– ';
+}
+
+.methodBody {
+  padding: 0 var(--s4) var(--s4);
+  border-top: 1px solid var(--rule);
+  padding-top: var(--s3);
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.methodBody dl {
+  margin: 0 0 var(--s3);
+  display: grid;
+  grid-template-columns: 168px 1fr;
+  gap: var(--s2) var(--s4);
+}
+
+.methodBody dt {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.methodBody dd {
+  margin: 0;
+}
+
+.methodBody ul {
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+.methodBody li + li {
+  margin-top: var(--s1);
+}
+
+/* --------------------------------------------------------------- drawer -- */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgb(16 18 24 / 38%);
+  border: 0;
+  padding: 0;
+  cursor: default;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  width: min(480px, 100vw);
+  background: var(--surface);
+  border-left: 1px solid var(--rule-strong);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.drawerHead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s3);
+  padding: var(--s5) var(--s5) var(--s4);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.drawerHead h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.drawerSite {
+  display: inline-block;
+  margin-top: var(--s1);
+  color: var(--action);
+  font-size: 13px;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.drawerSite:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.close {
+  flex: none;
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink-muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.close:hover {
+  border-color: var(--action);
+  color: var(--action);
+}
+
+.section {
+  padding: var(--s4) var(--s5);
+  border-bottom: 1px solid var(--rule);
+}
+
+.section:last-child {
+  border-bottom: 0;
+}
+
+.sectionTitle {
+  margin: 0 0 var(--s3);
+  color: var(--ink-faint);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.levelRow {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  flex-wrap: wrap;
+}
+
+/* Sits inside the section title it counts, not beside the level chip. */
+.levelCount {
+  margin-left: var(--s2);
+  color: var(--ink-muted);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.levelBlurb,
+.summaryText {
+  margin: var(--s3) 0 0;
+  color: var(--ink-muted);
+  font-size: 13.5px;
+}
+
+.signals {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.signal {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding: var(--s2) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.signal:last-child {
+  border-bottom: 0;
+}
+
+.signalLabel {
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.signalDetail {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-faint);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.signalState {
+  flex: none;
+}
+
+.evidence {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.evidenceItem {
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.evidenceItem:first-child {
+  padding-top: 0;
+}
+
+.evidenceItem:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.evidenceHead {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2);
+  flex-wrap: wrap;
+}
+
+.evidenceLink {
+  color: var(--action);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.evidenceLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sourceTag {
+  padding: 1px 6px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-sm);
+  color: var(--ink-muted);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.evidenceNote {
+  margin: var(--s1) 0 0;
+  color: var(--ink-muted);
+  font-size: 12.5px;
+}
+
+.evidenceMeta {
+  margin: var(--s1) 0 0;
+  color: var(--ink-muted);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.unknowns {
+  margin: 0;
+  padding-left: 1.1em;
+  color: var(--ink-muted);
+  font-size: 13.5px;
+}
+
+.unknowns li + li {
+  margin-top: var(--s1);
+}
+
+/* Named people and the company block share one quiet card treatment: a fact,
+   its qualifier, its links and the sentence a source actually supports. */
+.person {
+  padding: var(--s3);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.personName {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.personRole {
+  margin: 2px 0 0;
+  color: var(--ink-muted);
+  font-size: 12.5px;
+}
+
+.personLinks {
+  margin: var(--s2) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s3);
+  font-size: 12.5px;
+}
+
+.personLinks a {
+  overflow-wrap: anywhere;
+}
+
+.personEvidence {
+  margin: var(--s2) 0 0;
+  color: var(--ink-muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.people {
+  margin: var(--s3) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.people li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s1) var(--s2);
+  padding: var(--s2) 0;
+  border-top: 1px solid var(--rule);
+}
+
+/* The channel list is the provider passport: only what actually exists. */
+.channels {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.channels li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  padding: var(--s2) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.channels li:last-child {
+  border-bottom: 0;
+}
+
+.channels a {
+  overflow-wrap: anywhere;
+}
+
+.channelLabel {
+  flex: none;
+  width: 108px;
+  color: var(--ink-faint);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.caveat {
+  margin: 0;
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: var(--ink-muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.drawerFoot {
+  padding: var(--s4) var(--s5) var(--s6);
+}
+
+/* ------------------------------------------------------------ responsive -- */
+
+@media (max-width: 980px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* The shared price table becomes cards at 720px, which is right for four
+     numeric columns. This one has six, four of them company names and status
+     phrases, and at tablet width it overflowed the surrounding `.index`
+     container — which clips, so the last columns were simply unreachable. It
+     converts to cards a breakpoint earlier instead of being squeezed. */
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody,
+  .table tbody tr,
+  .table tbody td {
+    display: block;
+    width: 100%;
+  }
+
+  .table tbody tr {
+    padding: var(--s3) var(--s4) var(--s4);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  /* Values are names and status words rather than figures, so they read down a
+     left edge with the label above them. */
+  .table tbody td {
+    text-align: left;
+    padding: var(--s2) 0 var(--s1);
+    border-bottom: 0;
+  }
+
+  .table tbody td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* Provider identity leads the card; it is the heading, not a labelled field. */
+  .table tbody td[data-label='Provider'] {
+    margin-bottom: var(--s2);
+    padding: 0 0 var(--s2);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .table tbody td[data-label='Provider']::before {
+    display: none;
+  }
+
+  /* The card header is the tap target for the whole row, so it has to clear the
+     touch floor rather than being a 23px line of text. */
+  .nameButton {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: var(--h-tap);
+    font-size: 16px;
+  }
+
+  /* The two counts stay label-left, value-right: they are figures. */
+  .table tbody td[data-label='Official channels'],
+  .table tbody td[data-label='Last reviewed'] {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: var(--s1) 0;
+  }
+
+  .table tbody td[data-label='Official channels']::before,
+  .table tbody td[data-label='Last reviewed']::before {
+    margin-bottom: 0;
+  }
+
+  .table tbody tr[data-selected='true'] {
+    background: var(--action-wash);
+  }
+
+  .table tbody tr[data-selected='true'] td:first-child {
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .intro h2 {
+    font-size: 17px;
+  }
+
+  .cardValue {
+    font-size: 22px;
+  }
+
+  /* Chips need room to breathe once the table becomes a stack of cards. */
+  .filters button {
+    min-height: var(--h-tap);
+  }
+
+  .methodBody dl {
+    grid-template-columns: 1fr;
+    gap: var(--s1);
+  }
+
+  .methodBody dt {
+    margin-top: var(--s2);
+  }
+
+  /* A 480px rail on a phone is a squeeze, so the drawer becomes a sheet that
+     covers the page and scrolls on its own. Sized from its own fixed inset
+     rather than 100vw, which on some mobile browsers includes the scrollbar
+     width and pushes the sheet a few pixels wide. */
+  .drawer {
+    left: 0;
+    width: auto;
+    border-left: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .drawerHead,
+  .section,
+  .drawerFoot {
+    padding-left: var(--s4);
+    padding-right: var(--s4);
+  }
+
+  .close {
+    width: var(--h-tap);
+    height: var(--h-tap);
+  }
+
+  .identity {
+    grid-template-columns: 1fr;
+    gap: var(--s1);
+  }
+
+  .identity dt {
+    margin-top: var(--s2);
+  }
+
+  .signal {
+    padding: var(--s3) 0;
+  }
+
+  /* The card conversion itself lives in the 980px block above, which also
+     covers this range. Only phone-specific spacing belongs here. */
+  .table tbody tr {
+    padding: var(--s3) var(--s4) var(--s4);
+  }
+}

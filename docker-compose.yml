@@ -1,7 +1,13 @@
-# AI API Prices — public deployment template.
+# AI API Prices — deployment stack.
 #
-# Host binding and ingress configuration are environment-specific and are not
-# recorded in this repository.
+# Self-contained on purpose: its own project name, its own network, its own
+# images, so it can sit alongside anything else without interfering.
+#
+#   docker compose up -d --build                        start the site
+#   docker compose --profile refresh run --rm refresh   re-read providers
+#
+# This publishes one loopback port and nothing else. Exposing it to the
+# internet is a separate, deliberate step: put your own ingress in front.
 
 name: oxweb-prices
 
@@ -16,11 +22,18 @@ services:
     restart: unless-stopped
     cpus: "1.0"
     mem_limit: 512m
+    # Loopback by default; 3100 on the host so it does not collide with a
+    # dev server on 3000. Override with APP_BIND_HOST / APP_PORT.
     ports:
-      - "${APP_BIND_HOST:?set APP_BIND_HOST}:${APP_PORT:?set APP_PORT}:3000"
+      - "${APP_BIND_HOST:-127.0.0.1}:${APP_PORT:-3100}:3000"
+    # The dataset lives on the host so a refresh needs no rebuild, and so the
+    # generated file stays inspectable and committable.
     volumes:
       - ./data:/app/data
 
+  # One-shot: reruns every provider adapter and rewrites data/prices.json.
+  # The running site picks the new file up within its 5-minute revalidate
+  # window — no rebuild, no restart.
   refresh:
     profiles: ["refresh"]
     build:

@@ -25,7 +25,7 @@ npm run dev
 ```
 
 A fresh point-in-time dataset is committed at `data/prices.json`, so a new clone renders the
-current six-provider product without running a refresh first. Its `generated_at` value records
+current twelve-provider product without running a refresh first. Its `generated_at` value records
 exactly when that public snapshot was observed.
 
 ## Commands
@@ -68,7 +68,7 @@ Refreshing provider prices…
 
 Wrote … offers across … models
   -> /path/to/data/prices.json
-  6/6 providers ok in …s
+  12/12 providers ok in …s
 ```
 
 Exit codes: `0` all providers succeeded · `1` at least one adapter failed (the dataset is still
@@ -94,8 +94,14 @@ rebuild, app restart or manual browser reload.
 | [TokenMix](https://tokenmix.ai/) | `api.tokenmix.ai/api/models` | Public paginated catalogue API |
 | [RelayRouter](https://relayrouter.io/) | `relayrouter.io/models` | Public catalogue parser; explicit USD direct routes only |
 | [RelayGPU](https://relaygpu.com/) | `relaygpu.com/pricing` | Public pricing-page parser |
+| [ZenMux](https://zenmux.ai/) | `zenmux.ai/api/v1/models` | Public catalogue API; asserts the published unit and currency |
+| [GPTProto](https://gptproto.com/) | `gptproto.com/model` | Public catalogue parser |
+| [EvoLink](https://evolink.ai/) | `evolink.ai/pricing` | Public catalogue embedded in the pricing page |
+| [OhMyGPT](https://www.ohmygpt.com/) | `www.ohmygpt.com/models` | Public catalogue parser; USD-priced routes only |
+| [QuickSilver Pro](https://quicksilverpro.io/) | `quicksilverpro.io/pricing.json` | Public price file |
+| [TeamoRouter](https://teamorouter.com/) | `teamorouter.com/pricing` | Public pricing-table parser; charged rate only |
 
-These six curated active providers are read from live public sources and need no credentials. The
+These twelve curated active providers are read from live public sources and need no credentials. The
 implemented adapters for earlier providers remain in the codebase as inactive history, but they do
 not run, contribute rows or appear in public readouts. `src/lib/providers.ts` is the canonical
 active registry and controls the refresh set.

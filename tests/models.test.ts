@@ -45,6 +45,33 @@ describe('canonicalModelId', () => {
     expect(canonicalModelId('aion-labs/aion-3.0').id).toBe('aion-3.0');
   });
 
+  /**
+   * The gateway catalogues rename two vendors: xAI ships under its parent
+   * company and Z.ai under two different spellings. An unrecognised namespace
+   * is not dropped but glued on — "spacexai/grok-4.6" would become
+   * "spacexaigrok-4.6", a phantom model with no official baseline and so no
+   * savings figure, which would also drop it out of the featured-model gate.
+   */
+  it('folds the gateway spellings of the xAI and Z.ai namespaces', () => {
+    expect(canonicalModelId('spacexai/grok-4.6').id).toBe('grok-4.6');
+    expect(canonicalModelId('xai/grok-4.6').id).toBe('grok-4.6');
+    expect(canonicalModelId('zai/glm-5.2').id).toBe('glm-5.2');
+    expect(canonicalModelId('zai-org/glm-5.3').id).toBe('glm-5.3');
+    expect(canonicalModelId('z-ai/glm-5.3').id).toBe('glm-5.3');
+  });
+
+  /**
+   * OhMyGPT qualifies the vendor with the upstream route it resells through.
+   * The model is still GLM-5.2; the route is carried separately as a tier.
+   */
+  it('strips a vendor namespace qualified by an upstream route', () => {
+    expect(canonicalModelId('alibaba:zhipu/glm-5.2').id).toBe('glm-5.2');
+    expect(canonicalModelId('alibaba:deepseek/deepseek-v4-pro').id).toBe('deepseek-v4-pro');
+    expect(canonicalModelId('fireworks/deepseek-v4-pro').id).toBe('deepseek-v4-pro');
+    // The Bedrock-style dot separator must keep working.
+    expect(canonicalModelId('anthropic.claude-opus-4-5').id).toBe('claude-opus-4.5');
+  });
+
   it('keeps genuinely different models apart', () => {
     expect(canonicalModelId('claude-opus-4.5').id).not.toBe(canonicalModelId('claude-opus-4.6').id);
     // "-fast" is a separately priced routing variant, not a rendering of the base model.

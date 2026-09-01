@@ -35,6 +35,53 @@ export function updatedLabel(iso: string, now: number | null): string {
   return timeAgo(iso, now);
 }
 
+const MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+/**
+ * "27 Aug 2026" from a plain `YYYY-MM-DD` review date.
+ *
+ * Formatted by hand rather than through `toLocaleDateString`, which resolves
+ * against the runtime locale and would disagree between the server render and
+ * the browser. Review dates are calendar dates, not instants, so they are never
+ * shifted into a timezone.
+ */
+/**
+ * True only for a real calendar day. The shape alone would accept `2026-02-31`,
+ * which would then render as "31 Feb 2026".
+ */
+export function isCalendarDate(date: string): boolean {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  if (!match) return false;
+  const [year, month, day] = [Number(match[1]), Number(match[2]), Number(match[3])];
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  return (
+    parsed.getUTCFullYear() === year &&
+    parsed.getUTCMonth() === month - 1 &&
+    parsed.getUTCDate() === day
+  );
+}
+
+export function reviewedLabel(date: string): string {
+  if (!isCalendarDate(date)) return date;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date)!;
+  const month = MONTHS[Number(match[2]) - 1];
+  if (!month) return date;
+  return `${Number(match[3])} ${month} ${match[1]}`;
+}
+
 export function formatPercent(value: number): string {
   return value.toFixed(value % 1 === 0 ? 0 : 1);
 }

@@ -32,4 +32,11 @@
 
   --alert-bg: #fceee8;
   --alert-ink: #8a3b21;
+
+  --verify-ok-bg: #e6f3ea;
+  --verify-ok-ink: #1c6437;
+  --verify-gap-bg: #f4eee2;
+  --verify-gap-ink: #6d5828;
+  --verify-idle-bg: #edeff3;
+  --verify-idle-ink: #5b6270;
 }

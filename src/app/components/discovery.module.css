@@ -74,15 +74,32 @@
 }
 
 .providerLink {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--action);
+  font: inherit;
   font-weight: 600;
-  text-decoration: none;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 
-.providerLink:hover {
+.providerLink:hover,
+.providerLink:focus-visible,
+.providerLink[aria-expanded='true'] {
   color: var(--action-hover);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-color: currentColor;
+}
+
+.providerLink:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 .providerNameLink,
@@ -140,5 +157,11 @@
 
   .codingShortcuts button {
     min-height: var(--h-tap);
+  }
+
+  .providerLink {
+    min-height: var(--h-tap);
+    display: inline-flex;
+    align-items: center;
   }
 }

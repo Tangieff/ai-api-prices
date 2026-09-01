@@ -1,0 +1,14 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "anthropic/claude-opus-5",
+      "display_name": "Anthropic: Claude Opus 5",
+      "input_modalities": ["text", "image", "file"],
+      "output_modalities": ["text"],
+      "pricings": {
+        "prompt": [{ "value": 5, "unit": "perMTokens", "currency": "USD" }]
+      }
+    }
+  ]
+}

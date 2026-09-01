@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useDeferredValue, useId, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useCallback, useDeferredValue, useId, useMemo, useRef, useState } from 'react';
 import { pickFeaturedModels } from '@/lib/featured-models';
 import { buildProviderSummaries } from '@/lib/provider-summaries';
 import { matches } from '@/lib/search';
@@ -13,7 +14,17 @@ import { pluralise, updatedLabel, utcStamp } from './format';
 import { useClock } from './useClock';
 import styles from './discovery.module.css';
 
+/**
+ * Provider research stays out of the initial bundle. The compact passport loads
+ * only when a person previews or opens a provider from the pricing table.
+ */
+const ProviderPassport = dynamic(() => import('./ProviderPassport'), {
+  ssr: false,
+  loading: () => null,
+});
+
 const SEARCH_VISIBLE = 60;
+const PASSPORT_CLOSE_DELAY_MS = 240;
 
 const EXAMPLE_QUERIES = [
   'fable 5',
@@ -55,6 +66,9 @@ export function PriceExplorer({
 }: PriceExplorerProps) {
   const [query, setQuery] = useState('');
   const [view, setView] = useState<'models' | 'providers'>('models');
+  const [passportId, setPassportId] = useState<string | null>(null);
+  const [passportPinned, setPassportPinned] = useState(false);
+  const passportCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const deferredQuery = useDeferredValue(query);
   const inputId = useId();
 
@@ -83,13 +97,58 @@ export function PriceExplorer({
   const visibleProviders = providerMatches.slice(0, SEARCH_VISIBLE);
   const hiddenProviders = providerMatches.length - visibleProviders.length;
 
+  const cancelPassportClose = useCallback(() => {
+    if (!passportCloseTimer.current) return;
+    clearTimeout(passportCloseTimer.current);
+    passportCloseTimer.current = null;
+  }, []);
+
+  const closePassport = useCallback(() => {
+    cancelPassportClose();
+    setPassportPinned(false);
+    setPassportId(null);
+  }, [cancelPassportClose]);
+
+  const previewProvider = useCallback(
+    (providerId: string) => {
+      if (passportPinned) return;
+      cancelPassportClose();
+      setPassportId(providerId);
+    },
+    [passportPinned, cancelPassportClose],
+  );
+
+  const schedulePassportClose = useCallback(() => {
+    if (passportPinned) return;
+    cancelPassportClose();
+    passportCloseTimer.current = setTimeout(() => {
+      setPassportId(null);
+      passportCloseTimer.current = null;
+    }, PASSPORT_CLOSE_DELAY_MS);
+  }, [passportPinned, cancelPassportClose]);
+
+  const pinProvider = useCallback(
+    (providerId: string) => {
+      cancelPassportClose();
+      if (passportPinned && passportId === providerId) {
+        closePassport();
+        return;
+      }
+      setPassportId(providerId);
+      setPassportPinned(true);
+    },
+    [passportPinned, passportId, cancelPassportClose, closePassport],
+  );
+
   const switchView = (next: 'models' | 'providers') => {
     if (next === view) return;
+    closePassport();
     setView(next);
     setQuery('');
   };
 
   const applyCodingShortcut = (queryValue: string) => {
+    closePassport();
     setView('models');
     setQuery(queryValue);
   };
@@ -97,10 +156,14 @@ export function PriceExplorer({
   // Drives the two controls a human already uses, so an agent can hand the page
   // back in the state the conversation reached. Stable identity keeps the WebMCP
   // effect from re-registering its tools on every render.
-  const showInPage = useCallback(({ query: nextQuery, view: nextView }: ShowInPageRequest) => {
-    setView(nextView);
-    setQuery(nextQuery);
-  }, []);
+  const showInPage = useCallback(
+    ({ query: nextQuery, view: nextView }: ShowInPageRequest) => {
+      closePassport();
+      setView(nextView);
+      setQuery(nextQuery);
+    },
+    [closePassport],
+  );
 
   // Only what the tools read. `provider_status` stays on the server: its
   // `error` strings are scraper diagnostics, not something to ship to browsers.
@@ -259,7 +322,7 @@ export function PriceExplorer({
               <p className="results__meta" role="status">
                 {searching
                   ? `${pluralise(providerMatches.length, 'provider')} matching “${trimmedQuery}”`
-                  : `${pluralise(providerSummaries.length, 'provider')} with prices · sorted by model coverage`}
+                  : `${pluralise(providerSummaries.length, 'provider')} with prices · hover or tap a provider for details`}
               </p>
 
               {visibleProviders.length === 0 ? (
@@ -288,49 +351,58 @@ export function PriceExplorer({
                       </tr>
                     </thead>
                     <tbody>
-                      {visibleProviders.map((provider) => (
-                        <tr key={provider.id}>
-                          <td data-label="Provider">
-                            <a
-                              className={styles.providerLink}
-                              href={provider.visit_url}
-                              target="_blank"
-                              rel="noopener noreferrer nofollow"
-                            >
-                              {provider.name}
-                            </a>
-                          </td>
-                          <td data-label="Models" className="num num--lead">
-                            {provider.model_count}
-                          </td>
-                          <td data-label="Cheapest" className="num num--muted">
-                            {provider.cheapest_count}
-                          </td>
-                          <td data-label="Updated" className="num num--muted">
-                            {provider.latest_observed_at ? (
-                              <time
-                                dateTime={provider.latest_observed_at}
-                                title={utcStamp(provider.latest_observed_at)}
+                      {visibleProviders.map((provider) => {
+                        const passportOpen = passportId === provider.id;
+                        return (
+                          <tr key={provider.id}>
+                            <td data-label="Provider">
+                              <button
+                                type="button"
+                                className={styles.providerLink}
+                                aria-haspopup="dialog"
+                                aria-expanded={passportOpen}
+                                title="View provider details"
+                                onMouseEnter={() => previewProvider(provider.id)}
+                                onMouseLeave={schedulePassportClose}
+                                onFocus={() => previewProvider(provider.id)}
+                                onBlur={schedulePassportClose}
+                                onClick={() => pinProvider(provider.id)}
                               >
-                                {updatedLabel(provider.latest_observed_at, now)}
-                              </time>
-                            ) : (
-                              '—'
-                            )}
-                          </td>
-                          <td data-label="Visit">
-                            <a
-                              className="visit"
-                              href={provider.visit_url}
-                              target="_blank"
-                              rel="noopener noreferrer nofollow"
-                              aria-label={`Visit ${provider.name}`}
-                            >
-                              Visit
-                            </a>
-                          </td>
-                        </tr>
-                      ))}
+                                {provider.name}
+                              </button>
+                            </td>
+                            <td data-label="Models" className="num num--lead">
+                              {provider.model_count}
+                            </td>
+                            <td data-label="Cheapest" className="num num--muted">
+                              {provider.cheapest_count}
+                            </td>
+                            <td data-label="Updated" className="num num--muted">
+                              {provider.latest_observed_at ? (
+                                <time
+                                  dateTime={provider.latest_observed_at}
+                                  title={utcStamp(provider.latest_observed_at)}
+                                >
+                                  {updatedLabel(provider.latest_observed_at, now)}
+                                </time>
+                              ) : (
+                                '—'
+                              )}
+                            </td>
+                            <td data-label="Visit">
+                              <a
+                                className="visit"
+                                href={provider.visit_url}
+                                target="_blank"
+                                rel="noopener noreferrer nofollow"
+                                aria-label={`Visit ${provider.name}`}
+                              >
+                                Visit
+                              </a>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -346,6 +418,14 @@ export function PriceExplorer({
           )}
         </div>
       </div>
+
+      <ProviderPassport
+        providerId={passportId}
+        pinned={passportPinned}
+        onRequestClose={closePassport}
+        onPointerEnter={cancelPassportClose}
+        onPointerLeave={schedulePassportClose}
+      />
     </>
   );
 }

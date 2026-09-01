@@ -4,7 +4,7 @@
 #
 # Two things are built from one dependency tree:
 #
-#   runner   the Next.js standalone application image
+#   runner   the Next.js standalone server that answers ai-prices.oxweb.xyz
 #   refresh  a one-shot container that reruns the provider adapters and
 #            rewrites data/prices.json
 #
@@ -57,7 +57,7 @@ USER node
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD wget -q -O /dev/null "http://$(hostname):${PORT:-3000}/" || exit 1
+  CMD wget -q -O /dev/null http://127.0.0.1:3000/ || exit 1
 
 CMD ["node", "server.js"]
 
@@ -69,6 +69,6 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --chown=node:node . .
 # The job only needs to read the checkout and write data/prices.json, so it runs
-# with the same unprivileged application user.
+# with the same unprivileged user as the server rather than as root.
 USER node
 CMD ["npm", "run", "refresh-prices"]
