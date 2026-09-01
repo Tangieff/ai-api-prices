@@ -38,7 +38,7 @@
     "pro_account": 0.09,
     "vip": 0.09
   },
-  "pricing_version": "captured-2026-08-23",
+  "pricing_version": "2026-08-23",
   "success": true,
   "usable_group": {
     "claude": "Claude Route",

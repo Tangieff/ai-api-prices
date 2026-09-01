@@ -3,7 +3,7 @@
  *
  * globals.css still contains unused prefers-color-scheme tokens, but
  * this file is imported after it so system dark mode cannot turn the public
- * product into a dark dashboard. Keep the canonical light OX Index palette
+ * product into a dark dashboard. Keep the canonical light palette
  * here until/unless dark mode becomes an explicit product feature.
  */
 

@@ -16,7 +16,7 @@ afterEach(async () => {
 
 describe('dataset persistence', () => {
   it('replaces an existing dataset through a temporary sibling file', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'oxp-dataset-'));
+    const directory = await mkdtemp(join(tmpdir(), 'ai-api-prices-dataset-'));
     temporaryDirectories.push(directory);
 
     const dataDirectory = join(directory, 'data');

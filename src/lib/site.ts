@@ -1,8 +1,9 @@
 /**
  * Site-level constants.
  *
- * The OXWeb link is configurable because the ecosystem site and this tracker
- * are meant to cross-link, and the destination is not fixed yet.
+ * The OXWeb link is configurable through NEXT_PUBLIC_OXWEB_URL so a deployment
+ * can point the header at its own ecosystem site, or at a local one while
+ * developing, without editing source.
  */
 export const SITE = {
   name: 'AI API Prices',

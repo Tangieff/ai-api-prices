@@ -7,7 +7,7 @@ import type { Adapter, RawOffer } from './types';
  * LLMsRelay — public pricing-docs parser.
  *
  * LLMsRelay bills usage at Anthropic-equivalent per-token rates, then sells
- * prepaid usage balances at a large cash discount. OXP therefore publishes an
+ * prepaid usage balances at a large cash discount. The price index therefore publishes an
  * effective cash price rather than pretending the nominal usage rate is what a
  * customer pays out of pocket.
  *

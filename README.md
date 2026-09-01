@@ -109,7 +109,7 @@ active registry and controls the refresh set.
 ## Adding a provider
 
 1. Write `src/adapters/<provider>.ts` exporting an `Adapter` — a pure `parse*` function plus a thin
-   fetch wrapper, so the parser can be tested against a captured fixture.
+   fetch wrapper, so the parser can be tested against a synthetic fixture.
 2. Add the implementation to `ALL_ADAPTERS` in `src/adapters/index.ts`.
 3. Add the provider to `PROVIDERS` in `src/lib/providers.ts` only when it should become active.
 4. Add a fixture under `tests/fixtures/` and a parser test.
@@ -203,7 +203,7 @@ src/lib/                      money, models, search, scoring, dataset, view mode
 src/lib/webmcp/               WebMCP tool surface for AI agents
 src/refresh/run.ts            concurrent refresh with per-provider isolation
 src/app/                      Next.js App Router page and components
-tests/                        unit and parser tests, with captured fixtures
+tests/                        unit and parser tests, with synthetic fixtures
 Dockerfile                    container targets for the app and one-shot refresh
 docker-compose.yml            local container setup
 
@@ -229,9 +229,9 @@ docker compose --profile refresh run --rm refresh
 ## License
 
 [AGPL-3.0](LICENSE). If you run a modified version as a network service, you must offer
-its source to your users. Material that is not ours to license — the provider page excerpts
-used as test fixtures, and the font — is listed in
-[`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+its source to your users. The one piece of material that is not ours to license, the
+font, is listed in [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md), which also
+records why the test fixtures carry no third-party content.
 
 Running your own instance? Replace or remove the referral links in `src/lib/referrals.ts`.
 
