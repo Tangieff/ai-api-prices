@@ -1,0 +1,220 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "anthropic/claude-opus-5",
+      "object": "model",
+      "display_name": "Anthropic: Claude Opus 5",
+      "created": 1784912471,
+      "owned_by": "anthropic",
+      "input_modalities": ["text", "image", "file"],
+      "output_modalities": ["text"],
+      "capabilities": { "reasoning": true },
+      "context_length": 1000000,
+      "pricings": {
+        "completion": [{ "value": 25, "unit": "perMTokens", "currency": "USD" }],
+        "input_cache_read": [{ "value": 0.5, "unit": "perMTokens", "currency": "USD" }],
+        "input_cache_write_1_h": [{ "value": 10, "unit": "perMTokens", "currency": "USD" }],
+        "input_cache_write_5_min": [{ "value": 6.25, "unit": "perMTokens", "currency": "USD" }],
+        "prompt": [{ "value": 5, "unit": "perMTokens", "currency": "USD" }],
+        "web_search": [{ "value": 0.01, "unit": "perCount", "currency": "USD" }]
+      },
+      "publish_time": "2026-07-24"
+    },
+    {
+      "id": "openai/gpt-5.6-sol",
+      "object": "model",
+      "display_name": "OpenAI: GPT-5.6 Sol",
+      "created": 1783644683,
+      "owned_by": "openai",
+      "input_modalities": ["text", "image", "file"],
+      "output_modalities": ["text"],
+      "capabilities": { "reasoning": true },
+      "context_length": 1050000,
+      "pricings": {
+        "completion": [
+          {
+            "value": 20,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 0, "lt": 272 } }
+          },
+          {
+            "value": 30,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 272 } }
+          }
+        ],
+        "input_cache_read": [
+          {
+            "value": 0.4,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 0, "lt": 272 } }
+          },
+          {
+            "value": 0.8,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 272 } }
+          }
+        ],
+        "input_cache_write": [
+          {
+            "value": 5,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 0, "lt": 272 } }
+          },
+          {
+            "value": 10,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 272 } }
+          }
+        ],
+        "prompt": [
+          {
+            "value": 4,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 0, "lt": 272 } }
+          },
+          {
+            "value": 8,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 272 } }
+          }
+        ],
+        "web_search": [{ "value": 0.01, "unit": "perCount", "currency": "USD" }]
+      },
+      "publish_time": "2026-07-10"
+    },
+    {
+      "id": "x-ai/grok-4.6",
+      "object": "model",
+      "display_name": "xAI: Grok 4.6",
+      "created": 1786550329,
+      "owned_by": "x-ai",
+      "input_modalities": ["text", "image"],
+      "output_modalities": ["text"],
+      "capabilities": { "reasoning": true },
+      "context_length": 500000,
+      "pricings": {
+        "completion": [
+          {
+            "value": 6,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 0, "lte": 200 } }
+          },
+          {
+            "value": 12,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 200 } }
+          }
+        ],
+        "input_cache_read": [
+          {
+            "value": 0.5,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 0, "lte": 200 } }
+          },
+          {
+            "value": 1,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 200 } }
+          }
+        ],
+        "prompt": [
+          {
+            "value": 2,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 0, "lte": 200 } }
+          },
+          {
+            "value": 4,
+            "unit": "perMTokens",
+            "currency": "USD",
+            "conditions": { "prompt_tokens": { "unit": "kTokens", "gte": 200 } }
+          }
+        ],
+        "web_search": [{ "value": 0.005, "unit": "perCount", "currency": "USD" }]
+      },
+      "publish_time": "2026-08-13"
+    },
+    {
+      "id": "deepseek/deepseek-v4-pro",
+      "object": "model",
+      "display_name": "DeepSeek: DeepSeek V4 Pro 0813",
+      "created": 1777000366,
+      "owned_by": "deepseek",
+      "input_modalities": ["text"],
+      "output_modalities": ["text"],
+      "capabilities": { "reasoning": true },
+      "context_length": 1000000,
+      "pricings": {
+        "completion": [
+          { "value": 1.98, "unit": "perMTokens", "currency": "USD" },
+          { "value": 1.98, "unit": "perMTokens", "currency": "USD" },
+          { "value": 1.98, "unit": "perMTokens", "currency": "USD" },
+          { "value": 1.98, "unit": "perMTokens", "currency": "USD" },
+          { "value": 3.96, "unit": "perMTokens", "currency": "USD" },
+          { "value": 3.96, "unit": "perMTokens", "currency": "USD" }
+        ],
+        "input_cache_read": [
+          { "value": 0.022, "unit": "perMTokens", "currency": "USD" },
+          { "value": 0.022, "unit": "perMTokens", "currency": "USD" },
+          { "value": 0.022, "unit": "perMTokens", "currency": "USD" },
+          { "value": 0.022, "unit": "perMTokens", "currency": "USD" },
+          { "value": 0.044, "unit": "perMTokens", "currency": "USD" },
+          { "value": 0.044, "unit": "perMTokens", "currency": "USD" }
+        ],
+        "prompt": [
+          { "value": 0.66, "unit": "perMTokens", "currency": "USD" },
+          { "value": 0.66, "unit": "perMTokens", "currency": "USD" },
+          { "value": 0.66, "unit": "perMTokens", "currency": "USD" },
+          { "value": 0.66, "unit": "perMTokens", "currency": "USD" },
+          { "value": 1.32, "unit": "perMTokens", "currency": "USD" },
+          { "value": 1.32, "unit": "perMTokens", "currency": "USD" }
+        ]
+      },
+      "publish_time": "2026-08-12"
+    },
+    {
+      "id": "google/gemini-embedding-2",
+      "object": "model",
+      "display_name": "Google: Gemini Embedding 2",
+      "created": 1781588859,
+      "owned_by": "google",
+      "input_modalities": ["text"],
+      "output_modalities": ["embeddings"],
+      "capabilities": { "reasoning": false },
+      "context_length": 8192,
+      "pricings": {
+        "completion": [{ "value": 0, "unit": "perMTokens", "currency": "USD" }],
+        "prompt": [{ "value": 0.2, "unit": "perMTokens", "currency": "USD" }]
+      },
+      "publish_time": "2026-05-20"
+    },
+    {
+      "id": "meta/muse-image-1.0",
+      "object": "model",
+      "display_name": "Meta: Muse Image 1.0",
+      "created": 1787820642,
+      "owned_by": "meta",
+      "input_modalities": ["text", "image"],
+      "output_modalities": ["image"],
+      "capabilities": { "reasoning": false },
+      "context_length": 66000,
+      "pricings": {},
+      "publish_time": "2026-08-27"
+    }
+  ]
+}

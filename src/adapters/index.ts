@@ -18,6 +18,14 @@ import { llmrelayDevAdapter } from './llmrelay-dev';
 import { midrelayAdapter } from './midrelay';
 import { zrelayAdapter } from './zrelay';
 import { relayFastAdapter } from './relay-fast';
+import { vercelAiGatewayAdapter } from './vercel-ai-gateway';
+import { zenmuxAdapter } from './zenmux';
+import { atlasCloudAdapter } from './atlas-cloud';
+import { gptprotoAdapter } from './gptproto';
+import { evolinkAdapter } from './evolink';
+import { ohmygptAdapter } from './ohmygpt';
+import { teamorouterAdapter } from './teamorouter';
+import { quicksilverProAdapter } from './quicksilver-pro';
 
 /** Every implemented adapter, including providers retained as inactive history. */
 const ALL_ADAPTERS: Adapter[] = [
@@ -39,6 +47,16 @@ const ALL_ADAPTERS: Adapter[] = [
   midrelayAdapter,
   zrelayAdapter,
   relayFastAdapter,
+  // Implemented and tested, retained as inactive history: the product owner
+  // removed both from the active set, so neither is in the provider registry.
+  vercelAiGatewayAdapter,
+  atlasCloudAdapter,
+  zenmuxAdapter,
+  gptprotoAdapter,
+  evolinkAdapter,
+  ohmygptAdapter,
+  teamorouterAdapter,
+  quicksilverProAdapter,
 ];
 
 const ADAPTERS_BY_PROVIDER_ID = new Map(

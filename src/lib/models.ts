@@ -19,6 +19,7 @@ import type { Model } from './types';
 /** Vendor namespaces some catalogues prefix onto the model id. */
 const VENDOR_PREFIXES = [
   'aion-labs',
+  'alibaba',
   'allenai',
   'amazon',
   'anthracite-org',
@@ -39,6 +40,7 @@ const VENDOR_PREFIXES = [
   'mistralai',
   'mistral',
   'deepseek-ai',
+  'fireworks',
   'gryphe',
   'ibm-granite',
   'inception',
@@ -72,6 +74,10 @@ const VENDOR_PREFIXES = [
   'xiaomi',
   'zhipu',
   'z-ai',
+  'zai',
+  'zai-org',
+  // Gateways rename the xAI namespace after its parent company.
+  'spacexai',
 ];
 
 /**
@@ -119,8 +125,10 @@ export function canonicalModelId(raw: string): CanonicalModel {
   let slug = raw.trim().toLowerCase();
 
   // A vendor namespace is separated by "/" or ".", e.g. "anthropic/claude-opus-5"
-  // or "aion-labs.aion-2-0".
-  const namespaceSplit = /^([a-z0-9-]+)[/.](.+)$/.exec(slug);
+  // or "aion-labs.aion-2-0". Some gateways qualify the vendor with the upstream
+  // route they bought it through ("alibaba:zhipu/glm-5.2"); the model is still
+  // GLM-5.2, so the whole prefix goes and the adapter keeps the route as a tier.
+  const namespaceSplit = /^([a-z0-9-]+)(?::[a-z0-9-]+)?[/.](.+)$/.exec(slug);
   if (namespaceSplit && VENDOR_PREFIXES.includes(namespaceSplit[1]!)) {
     slug = namespaceSplit[2]!;
   }

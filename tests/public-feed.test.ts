@@ -1,14 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { GET } from '@/app/api/prices.json/route';
+import { PROVIDERS } from '@/lib/providers';
 
-const ACTIVE_PROVIDER_IDS = [
-  'cometapi',
-  'midrelay',
-  'relaygpu',
-  'relayrouter',
-  'surplus-intelligence',
-  'tokenmix',
-];
+/**
+ * Derived from the registry rather than restated. The point of the assertion is
+ * that the feed publishes the active set and nothing else — pinning a literal
+ * list here only means it has to be edited every time a provider is added.
+ */
+const ACTIVE_PROVIDER_IDS = PROVIDERS.map((provider) => provider.id).sort();
 
 describe('GET /api/prices.json', () => {
   it('publishes the normalized comparison data without internal search blobs', async () => {

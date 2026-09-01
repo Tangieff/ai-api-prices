@@ -1,0 +1,6 @@
+[
+  {
+    "id": "anthropic/claude-opus-5",
+    "pricing": { "prompt": "0.000005", "completion": "0.000025" }
+  }
+]

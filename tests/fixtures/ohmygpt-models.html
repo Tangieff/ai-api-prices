@@ -1,0 +1,22 @@
+<!-- Synthetic fixture. Reproduces the OhMyGPT parser's expected structure only. Not a capture of any third-party page. -->
+<!-- One <article> card per line. Covers: USD-priced text models, a card carrying a -->
+<!-- promotional badge sharing the price div's tabular-nums class, upstream-routed ids, -->
+<!-- CNY-priced cards that must be skipped rather than converted, a moderation product, -->
+<!-- a free card, and a malformed card with no price block at all. -->
+<!doctype html><html><body><main class="grid">
+<article><h3><a href="/models/claude-fable-5">Claude Fable 5</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">$11.00</span><span>/M</span><span class="tabular-nums">$55.00</span><span>/M</span></div></article>
+<article><h3><a href="/models/claude-opus-5">Claude Opus 5</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">$5.50</span><span>/M</span><span class="tabular-nums">$27.50</span><span>/M</span></div></article>
+<article><h3><a href="/models/claude-sonnet-5">Claude Sonnet 5</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">$2.20</span><span>/M</span><span class="tabular-nums">$11.00</span><span>/M</span></div></article>
+<article><h3><a href="/models/gpt-5.6-sol">GPT-5.6 Sol</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">$4.40</span><span>/M</span><span class="tabular-nums">$22.00</span><span>/M</span></div></article>
+<article><h3><a href="/models/gemini-3.1-pro-preview">Gemini 3.1 Pro Preview</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">$1.80</span><span>/M</span><span class="tabular-nums">$10.80</span><span>/M</span><span class="tabular-nums text-green-600">-10%</span></div></article>
+<article><h3><a href="/models/grok-4.6">Grok 4.6</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">$2.20</span><span>/M</span><span class="tabular-nums">$6.60</span><span>/M</span></div></article>
+<article><h3><a href="/models/gpt-5.6-terra">GPT-5.6 Terra</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">$2.20</span><span>/M</span><span class="tabular-nums">$13.20</span><span>/M</span></div></article>
+<article><h3><a href="/models/gpt-5.6-luna">GPT-5.6 Luna</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">$0.22</span><span>/M</span><span class="tabular-nums">$1.32</span><span>/M</span></div></article>
+<article><h3><a href="/models/alibaba%3Azhipu%2Fglm-5.2">GLM-5.2 (Alibaba route)</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">$0.66</span><span>/M</span><span class="tabular-nums">$2.3106</span><span>/M</span><span class="tabular-nums text-green-600">-40%</span></div></article>
+<article><h3><a href="/models/fireworks%2Fdeepseek-v4-pro">DeepSeek V4 Pro (Fireworks route)</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">$1.74</span><span>/M</span><span class="tabular-nums">$3.48</span><span>/M</span></div></article>
+<article><h3><a href="/models/tencent%2Fglm-5.3">GLM-5.3 (CNY only)</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">¥7.20</span><span>/M</span><span class="tabular-nums">¥25.20</span><span>/M</span></div></article>
+<article><h3><a href="/models/deepseek-v4-pro">DeepSeek V4 Pro (CNY only)</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">¥4.50</span><span>/M</span><span class="tabular-nums">¥13.50</span><span>/M</span></div></article>
+<article><h3><a href="/models/omni-moderation-latest">Omni Moderation Latest</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">$0.00</span><span>/M</span><span class="tabular-nums">$0.00</span><span>/M</span></div></article>
+<article><h3><a href="/models/glm-4.7-flash">GLM-4.7 Flash</a></h3><div class="flex items-baseline gap-2 text-sm mb-2"><span class="tabular-nums">Free</span><span>/M</span><span class="tabular-nums">Free</span><span>/M</span></div></article>
+<article><h3><a href="/models/mystery-model">Mystery Model</a></h3><p>A malformed card carrying no price block at all.</p></article>
+</main></body></html>

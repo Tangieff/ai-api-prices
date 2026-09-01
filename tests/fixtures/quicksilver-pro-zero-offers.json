@@ -1,0 +1,29 @@
+{
+  "_note": "Machine-readable pricing and model metadata generated from the canonical QuickSilver Pro model catalog. Do not hand-edit.",
+  "catalog_version": 15,
+  "provider": "QuickSilver Pro",
+  "provider_url": "https://quicksilverpro.io",
+  "api_base": "https://api.quicksilverpro.io/v1",
+  "openai_compatible": true,
+  "currency": "USD",
+  "unit": "mixed",
+  "updated": "2026-08-28",
+  "models": [
+    {
+      "id": "flux.2-pro",
+      "name": "FLUX.2 Pro",
+      "family": "black-forest-labs",
+      "category": "image",
+      "lifecycle": "active",
+      "thinking": false,
+      "supported_apis": ["images.generations"],
+      "capabilities": ["text_input", "image_output"],
+      "context_tokens": null,
+      "max_output_tokens": null,
+      "pricing_unit": "image",
+      "verified_at": "2026-07-31T00:00:00Z",
+      "output_per_image": 0.027,
+      "output_modality": "image"
+    }
+  ]
+}

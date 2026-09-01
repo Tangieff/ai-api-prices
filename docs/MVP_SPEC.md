@@ -2,7 +2,7 @@
 
 > Historical planning record: this file preserves the original five-provider MVP scope. It is not
 > the current active-provider specification; see the provider table in `README.md` and the
-> canonical registry in `src/lib/providers.ts` for the current curated six-provider product.
+> canonical registry in `src/lib/providers.ts` for the current curated twelve-provider product.
 
 ## One-sentence product
 

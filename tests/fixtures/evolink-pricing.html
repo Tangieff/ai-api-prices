@@ -1,0 +1,13 @@
+<!-- Synthetic fixture. Reproduces the EvoLink parser's expected structure only. Not a capture of any third-party page. -->
+<!-- The catalogue arrives as an escaped JSON array behind a rows marker inside an RSC -->
+<!-- payload, so the shape below mirrors that and nothing else. Each row carries both -->
+<!-- the charged rate (fallbackTiers, per 1K tokens) and the vendor list price the site -->
+<!-- discounts against (tiers / officialUSD) so the parser can be shown ignoring the latter. -->
+<!doctype html>
+<html lang="en">
+<head><meta charSet="utf-8"/><title>EvoLink Pricing</title></head>
+<body>
+<div id="__next"><p>Live catalog, every price below is what you actually pay.</p></div>
+<script>self.__next_f.push([1,"18:[\"$\",\"section\",null,{\"children\":[[\"$\",\"$L18\",null,{\"rows\":[{\"id\":\"claude-opus-5\",\"name\":\"Claude Opus 5\",\"modality\":\"text\",\"apiName\":\"claude-opus-5\",\"officialUSD\":0.005,\"tiers\":{\"input\":0.005,\"output\":0.025},\"fallbackTiers\":{\"input\":0.00475,\"output\":0.02375,\"cacheWrite\":0.0059382352941176,\"cacheHit\":0.000475}},{\"id\":\"grok-4.6\",\"name\":\"Grok 4.6\",\"modality\":\"text\",\"apiName\":\"grok-4.6\",\"officialUSD\":0.002,\"tiers\":{\"input\":0.002,\"output\":0.006},\"fallbackTiers\":{\"input\":0.0017,\"output\":0.0051,\"cacheWrite\":\"$undefined\",\"cacheHit\":0.000425}},{\"id\":\"nano-banana-2\",\"name\":\"Nano Banana 2\",\"modality\":\"image\",\"apiName\":\"nano-banana-2\",\"fallbackTiers\":{\"input\":0.03,\"output\":0.03}},{\"id\":\"gpt-6\",\"name\":\"GPT-6\",\"modality\":\"text\",\"apiName\":\"gpt-6\",\"fallbackTiers\":\"$undefined\"},{\"id\":\"claude-fable-5-1\",\"name\":\"Claude Fable 5.1\",\"modality\":\"text\",\"apiName\":\"claude-fable-5-1\",\"fallbackTiers\":{\"input\":\"$undefined\",\"output\":\"$undefined\"}},{\"id\":\"broken-row\",\"name\":\"Broken Row\",\"modality\":\"text\",\"apiName\":\"broken-row\",\"fallbackTiers\":{\"input\":0,\"output\":-1}}]}]]}]\n"])</script>
+</body>
+</html>

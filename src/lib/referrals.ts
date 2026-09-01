@@ -19,6 +19,9 @@ export const REFERRAL_URLS = {
   packyapi: 'https://www.packyapi.ai/register?aff=fF9b',
   omniakey: 'https://omniakey.com/ru/register?aff=iCpK2i0Z',
   'relay-fast': 'https://relay.fast/sign-up?aff=H9hI',
+  zenmux: 'https://zenmux.ai/invite/3DVZPH',
+  gptproto: 'https://gptproto.com/?r=U00VN917',
+  'quicksilver-pro': 'https://quicksilverpro.io/?ref=8B8UFVYL',
 } as const;
 
 export type ReferralProviderId = keyof typeof REFERRAL_URLS;

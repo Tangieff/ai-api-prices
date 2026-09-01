@@ -49,6 +49,21 @@
   --alert-bg: #fceee8;
   --alert-ink: #8a3b21;
 
+  /* Evidence states, used only by the provider transparency layer.
+     Deliberately their own tokens rather than a reuse of --save-*: amber in a
+     price row still means money saved and nothing else, and no price and no
+     evidence chip ever share a table. Green marks evidence we actually found,
+     cobalt marks a neutral informational state, sand marks public information
+     that is missing or incomplete, and the neutral pair marks "not reviewed".
+     Nothing here is red: an unidentified operator is a gap in public data, not
+     a fault, and must never be coloured like an error. */
+  --verify-ok-bg: #e6f3ea;
+  --verify-ok-ink: #1c6437;
+  --verify-gap-bg: #f4eee2;
+  --verify-gap-ink: #6d5828;
+  --verify-idle-bg: #edeff3;
+  --verify-idle-ink: #5b6270;
+
   /* One radius language. */
   --radius: 4px;
   --radius-sm: 3px;
@@ -94,6 +109,13 @@
 
     --alert-bg: #3a241c;
     --alert-ink: #eba98e;
+
+    --verify-ok-bg: #16301f;
+    --verify-ok-ink: #86cfa0;
+    --verify-gap-bg: #2f2a1d;
+    --verify-gap-ink: #d7c391;
+    --verify-idle-bg: #23272f;
+    --verify-idle-ink: #a2aab8;
   }
 }
 

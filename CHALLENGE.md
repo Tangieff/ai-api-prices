@@ -128,3 +128,53 @@ is feature-detected and adds no markup.
 The maintainer has run all five tools end to end in the ChatGPT in-app browser against
 production. The submission's demo video is the record of that run; this file is not
 evidence of it.
+
+---
+
+## Challenge-period hardening — September 2026
+
+Work done inside the Submission Period, after the sections above. The commit history is
+the evidence; this section only summarises it.
+
+**The active provider set grew from six to twelve.** Six gateways were added — ZenMux,
+GPTProto, EvoLink, OhMyGPT, QuickSilver Pro and TeamoRouter. Each was admitted on the same
+two questions: is there a public, retrievable customer price, and can the service be
+publicly attributed to a named person or a registered company. Two further gateways were
+implemented and tested but are **not** active, so their adapters sit in the tree as history
+without contributing a row.
+
+**What that changed for the comparison tables.** Every one of the six flagship models
+— Claude Fable 5, Claude Opus 5, Claude Sonnet 5, GPT-5.6 Sol, Gemini 3.1 Pro Preview and
+Grok 4.6 — now carries more providers than before, between seven and ten each, and each is
+compared against an independently maintained first-party baseline.
+
+**Normalisation was hardened, twice, because real catalogues broke it.** Gateways rename
+model namespaces, and an unrecognised namespace was being glued onto the model id rather
+than stripped, producing a model with no official baseline and therefore no savings figure.
+Separately, one gateway labels every model "Vendor: Model", and the pipeline canonicalises
+that label ahead of the id, folding it to a similarly broken id. Both are fixed and both
+have regression tests.
+
+**Provider-stated prices are never trusted.** Several of these catalogues publish a
+struck-through "list" price, a "% off" badge, or a claimed official rate — and some of
+those claims are simply wrong, including one whose advertised discount is larger than the
+maker's real price gap and another whose "discounted" output rate is above the official
+one. None of it is ingested. Savings are computed only against `src/lib/official-prices.ts`.
+
+**Prices are read live, not pinned.** Where a provider's rate is a time-limited promotion
+it is ingested as published and corrects itself on the next refresh. Where a route is
+priced in a currency with no published conversion, it is excluded rather than converted at
+an invented rate.
+
+**A provider transparency layer** records what the public record establishes about who
+operates each provider — a named operator, a registered company, or neither. It is
+deliberately not a safety, quality or authenticity rating, and it does not verify that a
+provider serves the model it advertises. `docs/PROVIDER_VERIFICATION.md` states those
+limits in full.
+
+### What this product still is not
+
+It compares published prices. It does not buy, route or resell inference, does not process
+payments, does not verify model authenticity, and does not rate providers as trustworthy.
+Outbound links to some providers carry a referral code; that affects navigation only and
+never ranking, ingestion, savings or the WebMCP tool results.

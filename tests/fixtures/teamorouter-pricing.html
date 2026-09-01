@@ -1,0 +1,82 @@
+<!-- Synthetic fixture. Reproduces the TeamoRouter parser's expected structure and column
+     semantics (class="off" = struck-through "List" reference, class="tr" = actual
+     "TeamoRouter" customer charge) with the prices observed on the live /pricing page on
+     2026-08-30. Not a verbatim capture of the live page (icons and non-price columns
+     trimmed). -->
+<section class="pricing" id="pricing">
+  <table class="price-table">
+    <thead>
+      <tr>
+        <th data-en="Model">Model</th>
+        <th data-en="Context">Context</th>
+        <th data-en="Input (List)">Input (List)</th>
+        <th data-en="Output (List)">Output (List)</th>
+        <th class="tr" data-en="Input (TeamoRouter)">Input (TeamoRouter)</th>
+        <th class="tr" data-en="Output (TeamoRouter)">Output (TeamoRouter)</th>
+        <th data-en="Provider">Provider</th>
+        <th data-en="Uptime (SLA)">Uptime (SLA)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-vendor="OpenAI">
+        <td class="model"><span class="ent"><span class="ent-txt"><span class="ent-name">GPT-5.6 Sol</span><span class="ent-sub">OpenAI</span></span></span></td>
+        <td class="ctx">1M</td>
+        <td class="off">$5.00</td>
+        <td class="off">$30.00</td>
+        <td class="tr">$0.53 <span class="disc" data-en="90% off">90% off</span><small class="cache" data-en="Cache $0.053">Cache $0.053</small></td>
+        <td class="tr">$3.18</td>
+        <td class="rts"></td>
+        <td class="sla"><span class="sla-v">99.9%</span></td>
+      </tr>
+      <tr data-vendor="Anthropic">
+        <td class="model"><span class="ent"><span class="ent-txt"><span class="ent-name">Claude Sonnet 5</span><span class="ent-sub">Anthropic</span></span></span></td>
+        <td class="ctx">1M</td>
+        <td class="off">$3.00</td>
+        <td class="off">$15.00</td>
+        <td class="tr">$0.50 <span class="disc" data-en="-84%">-84%</span></td>
+        <td class="tr">$2.52</td>
+        <td class="rts"></td>
+        <td class="sla"><span class="sla-v">99.9%</span></td>
+      </tr>
+      <tr data-vendor="DeepSeek">
+        <td class="model"><span class="ent"><span class="ent-txt"><span class="ent-name">DeepSeek V4 Pro</span><span class="ent-sub">DeepSeek</span></span></span></td>
+        <td class="ctx">1M</td>
+        <td class="off">$0.435</td>
+        <td class="off">$0.87</td>
+        <td class="tr">$0.435</td>
+        <td class="tr">$0.87</td>
+        <td class="rts"></td>
+        <td class="sla"><span class="sla-v">99.8%</span></td>
+      </tr>
+      <tr data-vendor="OpenAI">
+        <td class="model"><span class="ent"><span class="ent-txt"><span class="ent-name">Whisper-1</span><span class="ent-sub">OpenAI</span></span></span></td>
+        <td class="ctx">—</td>
+        <td class="off">$0.006</td>
+        <td class="off">$0.006</td>
+        <td class="tr">$0.006</td>
+        <td class="tr">$0.006</td>
+        <td class="rts"></td>
+        <td class="sla"><span class="sla-v">99.5%</span></td>
+      </tr>
+      <tr data-vendor="Moonshot">
+        <td class="model"><span class="ent"><span class="ent-txt"><span class="ent-name">Kimi K3 Broken</span><span class="ent-sub">Moonshot</span></span></span></td>
+        <td class="ctx">1M</td>
+        <td class="off">$1.00</td>
+        <td class="tr">$0.10</td>
+        <td class="tr">$0.60</td>
+        <td class="rts"></td>
+        <td class="sla"><span class="sla-v">99.0%</span></td>
+      </tr>
+      <tr data-vendor="Google">
+        <td class="model"><span class="ent"><span class="ent-txt"><span class="ent-name">Gemini 3.1 Pro (Preview) No Price</span><span class="ent-sub">Google</span></span></span></td>
+        <td class="ctx">2M</td>
+        <td class="off">$2.00</td>
+        <td class="off">$12.00</td>
+        <td class="tr"></td>
+        <td class="tr">$1.73</td>
+        <td class="rts"></td>
+        <td class="sla"><span class="sla-v">99.9%</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>

@@ -16,16 +16,25 @@ const EXPECTED_REFERRALS = {
   packyapi: 'https://www.packyapi.ai/register?aff=fF9b',
   omniakey: 'https://omniakey.com/ru/register?aff=iCpK2i0Z',
   'relay-fast': 'https://relay.fast/sign-up?aff=H9hI',
+  zenmux: 'https://zenmux.ai/invite/3DVZPH',
+  gptproto: 'https://gptproto.com/?r=U00VN917',
+  'quicksilver-pro': 'https://quicksilverpro.io/?ref=8B8UFVYL',
 } as const;
 
 describe('provider affiliate destinations', () => {
   const activeProviderIds = [
     'cometapi',
+    'evolink',
+    'gptproto',
     'midrelay',
+    'ohmygpt',
+    'quicksilver-pro',
     'relaygpu',
     'relayrouter',
     'surplus-intelligence',
+    'teamorouter',
     'tokenmix',
+    'zenmux',
   ];
 
   it('stores the full supplied referral list verbatim', () => {
