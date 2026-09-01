@@ -103,9 +103,9 @@ const records: OfficialPriceBaseline[] = [
   baseline('grok-4.5', 2, 6, XAI_SOURCE, 'Standard short-context pricing below 200K prompt tokens.'),
   baseline('grok-4.3', 1.25, 2.5, XAI_SOURCE, 'Standard short-context pricing below 200K prompt tokens.'),
 
-  // DeepSeek V4 pricing is time-of-day dependent (peak and off-peak). OXP
-  // cannot honestly represent either schedule as one universal standard
-  // baseline, so those public comparisons fail closed until the data model can
+  // DeepSeek V4 pricing is time-of-day dependent (peak and off-peak). The
+  // price index cannot honestly represent either schedule as one universal
+  // standard baseline, so those public comparisons fail closed until the data model can
   // match an offer to the applicable official schedule.
 
   baseline('glm-5.3', 1.4, 4.4, ZAI_SOURCE, 'Standard Z.ai pay-as-you-go text pricing.'),
@@ -133,7 +133,7 @@ const INCOMPATIBLE_TIER =
  * Provider route and plan labels normally remain comparable: they explain how
  * the relay arrives at its price, but the economic reference is still the same
  * maker API model. Official batch/priority/fast and long-context variants are
- * deliberately excluded unless OXP represents them as their own canonical
+ * deliberately excluded unless the price index represents them as their own canonical
  * model with a matching baseline.
  */
 export function officialPriceComparison(

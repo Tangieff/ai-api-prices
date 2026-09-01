@@ -3,8 +3,7 @@
 # Keep this tight: everything listed here is either rebuilt inside the image,
 # irrelevant to it, or must never reach an image layer at all.
 
-# Secrets. Nothing in the build needs an env file, and excluding them also
-# stops `next build` from silently picking up host values.
+# Local environment files are outside the image build context.
 .env
 .env.*
 

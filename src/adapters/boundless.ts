@@ -12,7 +12,7 @@ import type { Adapter, RawOffer } from './types';
  * product metadata but are not offers a visitor can actually buy yet.
  *
  * The page mixes token-priced LLMs with per-second video and per-image models.
- * Only plain input/output token pairs belong in the OXP comparison table.
+ * Only plain input/output token pairs belong in the comparison table.
  */
 const MODELS_URL = 'https://www.boundlessapi.com/en/models.html';
 

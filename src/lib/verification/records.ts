@@ -3,9 +3,7 @@ import type { ProviderVerificationRecord } from './types';
 /**
  * Researched provider transparency records.
  *
- * See `docs/PROVIDER_VERIFICATION.md` for the methodology and the update
- * procedure. A separate internal matrix, not published, records which providers
- * were already checked and deliberately rejected.
+ * See `docs/PROVIDER_VERIFICATION.md` for the methodology and update procedure.
  *
  * The short version:
  *
@@ -2412,9 +2410,7 @@ export const VERIFICATION_RECORDS: ProviderVerificationRecord[] = [
  *
  * A `Map` silently lets the last entry win, so a second record for a provider
  * would quietly replace the first — including replacing researched evidence with
- * an empty stub — and the only thing standing between that and production would
- * be remembering to run the tests. Failing at module load makes it impossible to
- * ship.
+ * an empty stub. Failing at module load makes the duplicate impossible to ship.
  */
 export function indexRecords(
   records: ProviderVerificationRecord[],

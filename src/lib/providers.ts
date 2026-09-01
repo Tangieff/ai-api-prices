@@ -34,7 +34,7 @@ export const PROVIDERS: Provider[] = [
     affiliate_url: referralUrl('relayrouter'),
     pricing_source_url: 'https://relayrouter.io/models',
     source_kind: 'html',
-    blurb: 'Relay catalogue; OXP includes only direct routes with explicit USD token prices.',
+    blurb: 'Relay catalogue; only direct routes with explicit USD token prices are included.',
   },
   {
     id: 'tokenmix',

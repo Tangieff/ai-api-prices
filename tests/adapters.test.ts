@@ -7,8 +7,9 @@ import { parseModelsPage } from '@/adapters/getgoapi';
 import { parseHomepage as parseWorldgateHomepage } from '@/adapters/worldgate';
 
 /**
- * Parser tests run against fixtures captured from the providers' real pages, so
- * a layout change is caught here rather than by an empty comparison table.
+ * Parser tests run against synthetic fixtures that reproduce only the structure
+ * each parser keys on, so a layout change is caught here rather than by an empty
+ * comparison table.
  */
 
 const fixture = (name: string) =>

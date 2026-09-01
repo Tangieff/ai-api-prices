@@ -70,7 +70,7 @@ export function parsePricing(payload: unknown): RawOffer[] {
     const model = rawModel as FrugalModel;
 
     // quota_type 0 is token pricing. Request/image pricing does not belong in
-    // OXP's per-1M-token comparison.
+    // the per-1M-token comparison.
     if (model.quota_type !== 0 || typeof model.model_name !== 'string') continue;
 
     const modelRatio = finiteNumber(model.model_ratio);
