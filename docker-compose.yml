@@ -3,7 +3,7 @@
 #   docker compose up -d --build                        start the site
 #   docker compose --profile refresh run --rm refresh   re-read providers
 
-name: oxweb-prices
+name: ai-api-prices
 
 services:
   app:
@@ -12,7 +12,7 @@ services:
       target: runner
       args:
         NEXT_PUBLIC_OXWEB_URL: ${NEXT_PUBLIC_OXWEB_URL:-https://oxweb.xyz}
-    image: oxweb-prices-app:latest
+    image: ai-api-prices-app:latest
     restart: unless-stopped
     cpus: "1.0"
     mem_limit: 512m
@@ -30,7 +30,7 @@ services:
     build:
       context: .
       target: refresh
-    image: oxweb-prices-refresh:latest
+    image: ai-api-prices-refresh:latest
     restart: "no"
     volumes:
       - ./data:/app/data

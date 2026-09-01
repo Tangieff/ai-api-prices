@@ -6,6 +6,30 @@ providers and models, estimate workload costs, and hand the result back to the v
 
 **Live demo: <https://ai-prices.oxweb.xyz>**
 
+## Existing project / Challenge contribution
+
+AI API Prices existed before the Submission Period. The WebMCP integration was added
+during it, and is the challenge contribution.
+
+Both points are checkable in this repository's own history:
+
+| | Commit | Date (UTC) |
+| --- | --- | --- |
+| State of the project before the challenge | `d2c87c57dcf5335a9098f0567e38de6ba5cd92da` | 2026-08-24 |
+| WebMCP implementation | `18d9d9322a209a93b67174d675a4c69d661f6e8f` | 2026-08-26T13:48:30Z |
+
+The second commit is titled *"feat: expose the price index to AI agents over WebMCP"*.
+To read the boundary directly:
+
+```bash
+git log --date=iso-strict --pretty="%h %ad %s" d2c87c5..18d9d93
+```
+
+What the challenge added is the agent surface, and only that: the five WebMCP tools
+listed below, and the handoff that puts an agent's answer back onto the page the person
+is looking at. The price index itself — the providers, the normalisation, the ranking and
+the site — is prior work.
+
 ## Why WebMCP fits this product
 
 Price comparison is easier when an agent can query structured data instead of reading a table
