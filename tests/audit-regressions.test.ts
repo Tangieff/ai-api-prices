@@ -5,9 +5,7 @@ import { canonicalModelId } from '@/lib/models';
 import { loadDataset } from '@/lib/dataset';
 import { buildPageData } from '@/lib/view';
 
-/**
- * Regressions found by the pre-deploy audit of `main` at 54776c4.
- */
+/** Regression coverage for dataset and rendering edge cases. */
 
 describe('model detail pages resolve every URL the site publishes', () => {
   /**

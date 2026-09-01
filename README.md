@@ -9,8 +9,8 @@ search, compare and cost workloads against the same normalized catalogue.
 **Live: <https://ai-prices.oxweb.xyz>**
 
 In a WebMCP-capable browser the same data is available to an AI agent as five callable
-tools — see [Agent tools (WebMCP)](#agent-tools-webmcp). What was built for the OpenAI
-WebMCP Challenge, and when, is set out in [`CHALLENGE.md`](CHALLENGE.md).
+tools — see [Agent tools (WebMCP)](#agent-tools-webmcp). The challenge feature and demo
+flow are summarized in [`CHALLENGE.md`](CHALLENGE.md).
 
 ---
 
@@ -79,7 +79,7 @@ previous run are carried forward, marked `stale` in the UI, and the error is rec
 `provider_status`. Every other provider refreshes normally. The public page always renders the last
 usable dataset.
 
-Homepage and model-page HTML read `data/prices.json` dynamically on every request and use private
+Homepage and model-page HTML read `data/prices.json` dynamically on every request and use explicit
 no-cache/no-store response headers. Already-open pages call `router.refresh()` every five minutes,
 on a throttled foreground return, and after BFCache restoration, so a refresh appears without a
 rebuild, app restart or manual browser reload.
@@ -101,8 +101,8 @@ rebuild, app restart or manual browser reload.
 | [QuickSilver Pro](https://quicksilverpro.io/) | `quicksilverpro.io/pricing.json` | Public price file |
 | [TeamoRouter](https://teamorouter.com/) | `teamorouter.com/pricing` | Public pricing-table parser; charged rate only |
 
-These twelve curated active providers are read from live public sources and need no credentials. The
-implemented adapters for earlier providers remain in the codebase as inactive history, but they do
+These twelve curated active providers are read from live public sources without authentication. The
+additional implemented adapters remain inactive: they do
 not run, contribute rows or appear in public readouts. `src/lib/providers.ts` is the canonical
 active registry and controls the refresh set.
 
@@ -204,29 +204,27 @@ src/lib/webmcp/               WebMCP tool surface for AI agents
 src/refresh/run.ts            concurrent refresh with per-provider isolation
 src/app/                      Next.js App Router page and components
 tests/                        unit and parser tests, with captured fixtures
-Dockerfile                    production image: the server, and the refresh one-shot
-docker-compose.yml            the stack, local only
+Dockerfile                    container targets for the app and one-shot refresh
+docker-compose.yml            local container setup
 
 ```
 
 ## Configuration
 
-No credentials or paid services are required. One optional variable:
+No paid services are required. One optional variable:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `NEXT_PUBLIC_OXWEB_URL` | `https://oxweb.xyz` | Destination of the header's OXWeb link |
 
-## Deployment
+## Container usage
 
-Build and run the application with environment-specific network settings supplied outside the repository:
+Build and run the application locally:
 
 ```bash
 docker compose up -d --build
 docker compose --profile refresh run --rm refresh
 ```
-
-Credentials, ingress configuration and operator procedures are intentionally not stored here.
 
 ## License
 

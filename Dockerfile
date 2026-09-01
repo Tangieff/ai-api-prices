@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
 
-# AI API Prices — production image.
+# AI API Prices — container image.
 #
 # Two things are built from one dependency tree:
 #
-#   runner   the Next.js standalone server that answers ai-prices.oxweb.xyz
+#   runner   the Next.js standalone application
 #   refresh  a one-shot container that reruns the provider adapters and
 #            rewrites data/prices.json
 #
@@ -68,7 +68,7 @@ FROM deps AS refresh
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --chown=node:node . .
-# The job only needs to read the checkout and write data/prices.json, so it runs
-# with the same unprivileged user as the server rather than as root.
+# The job only needs to read the app files and write data/prices.json, so it runs
+# as the same unprivileged user as the application.
 USER node
 CMD ["npm", "run", "refresh-prices"]

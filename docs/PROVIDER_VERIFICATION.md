@@ -79,7 +79,6 @@ src/lib/verification/records.ts   the researched records — the only file you e
 src/lib/verification/derive.ts    level, signals and status derivation
 src/lib/verification/filters.ts   the filter chips
 src/lib/verification/index.ts     row and summary shaping
-(internal, unpublished)          the provider-by-provider research matrix
 ```
 
 There is no database, no admin surface and no runtime collection. Records are a
@@ -94,7 +93,7 @@ the evidence payload out of every homepage response — most visits never open a
 passport.
 
 Every active provider in `PROVIDERS` must have exactly one record. Records for
-inactive providers may remain as historical research, but they cannot produce a
+inactive providers may remain for reference, but they cannot produce a
 passport row. An active provider without a record renders as `Unverified` / `Not
 reviewed`, and `tests/provider-verification.test.ts` fails until the record exists.
 
@@ -192,7 +191,7 @@ Rules:
 - Never turn a pseudonym into a real name. A handle is a handle.
 - Store only public professional identity — name, role, public profile URL,
   relationship to the provider. No home addresses, phone numbers, family details
-  or private contact information. **A name appearing only inside a mailing
+  or non-public contact information. **A name appearing only inside a mailing
   address is not an operator claim** and must not be published as one.
 - Distinguish a parent company from the specific product where they differ. If
   someone founded the parent but no source ties them to this product, say that.

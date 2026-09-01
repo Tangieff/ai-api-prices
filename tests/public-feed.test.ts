@@ -10,7 +10,7 @@ import { PROVIDERS } from '@/lib/providers';
 const ACTIVE_PROVIDER_IDS = PROVIDERS.map((provider) => provider.id).sort();
 
 describe('GET /api/prices.json', () => {
-  it('publishes the normalized comparison data without internal search blobs', async () => {
+  it('publishes the normalized comparison data without search-only fields', async () => {
     const response = await GET();
     const body = (await response.json()) as {
       schema_version: number;
