@@ -228,8 +228,17 @@ export function buildWebMcpTools(context: WebMcpToolContext): ModelContextTool[]
       const headline = result.cheapest
         ? `Cheapest: ${result.cheapest.provider_name} at ${priceLine(result.cheapest.input_usd_per_1m, result.cheapest.output_usd_per_1m)}.`
         : 'No provider publishes a comparable input and output price for this model.';
+      // `returned` counts rows, and one provider can publish several — a
+      // long-context tier alongside its base rate. Counting rows against
+      // `provider_count`, which is distinct providers, produced summaries like
+      // "11 of 9 providers". Both sides of the ratio are distinct providers
+      // now, and the extra rows are named rather than left to look like a
+      // miscount.
+      const shownProviders = new Set(result.providers.map((provider) => provider.provider_id)).size;
+      const extraRows =
+        result.returned > shownProviders ? ` (${result.returned} priced routes)` : '';
       return ok(
-        `${result.model.display_name} — ${result.returned} of ${result.provider_count} providers, cheapest first (${COST_SCORE_LABEL}). ${headline}${asOf(result.generated_at)}\n${lines.join('\n')}`,
+        `${result.model.display_name} — ${shownProviders} of ${result.provider_count} providers${extraRows}, cheapest first (${COST_SCORE_LABEL}). ${headline}${asOf(result.generated_at)}\n${lines.join('\n')}`,
         result,
       );
     }),
