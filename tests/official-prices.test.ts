@@ -121,6 +121,7 @@ describe('official model-maker price baselines', () => {
     });
     expect(data.models[0]!.offers[0]).toMatchObject({
       discount_pct: null,
+      official_price_delta_pct: null,
       discount_unavailable_reason: 'Official baseline requires re-verification',
     });
     expect(data.models[0]!.best_discount_pct).toBeNull();
@@ -167,7 +168,9 @@ describe('official model-maker price baselines', () => {
 
     expect(offers).toHaveLength(2);
     expect(offers[0]!.discount_pct).toBe(80);
+    expect(offers[0]!.official_price_delta_pct).toBe(-80);
     expect(offers[1]!.discount_pct).toBe(80);
+    expect(offers[1]!.official_price_delta_pct).toBe(-80);
     expect(data.models[0]!.best_discount_pct).toBe(80);
   });
 
@@ -175,17 +178,23 @@ describe('official model-maker price baselines', () => {
     const data = pageData([offer('midrelay', { model_id: 'unknown-model' })]);
     expect(data.models[0]!.offers[0]).toMatchObject({
       discount_pct: null,
+      official_price_delta_pct: null,
       discount_unavailable_reason: 'Official comparable baseline unavailable',
     });
   });
 
-  it('does not fabricate a saving at or above official price', () => {
+  it('keeps saving semantics while exposing equal and above-official prices', () => {
     const data = pageData([
       offer('midrelay', { input_usd_per_1m: 5, output_usd_per_1m: 25 }),
       offer('cometapi', { input_usd_per_1m: 6, output_usd_per_1m: 30 }),
     ]);
-    for (const item of data.models[0]!.offers) {
-      expect(item.discount_pct).toBeNull();
+    const offers = data.models[0]!.offers;
+
+    expect(offers[0]!.discount_pct).toBeNull();
+    expect(offers[0]!.official_price_delta_pct).toBe(0);
+    expect(offers[1]!.discount_pct).toBeNull();
+    expect(offers[1]!.official_price_delta_pct).toBe(20);
+    for (const item of offers) {
       expect(item.discount_unavailable_reason).toBe('No saving vs official standard API price');
     }
   });
@@ -197,6 +206,9 @@ describe('official model-maker price baselines', () => {
     expect(comparison.unavailable_reason).toContain('for this tier');
 
     const data = pageData([offer('midrelay', { tier: 'Claude / direct · batch' })]);
-    expect(data.models[0]!.offers[0]!.discount_pct).toBeNull();
+    expect(data.models[0]!.offers[0]).toMatchObject({
+      discount_pct: null,
+      official_price_delta_pct: null,
+    });
   });
 });
