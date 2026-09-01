@@ -98,3 +98,65 @@ describe('WebMCP tool definitions', () => {
     }
   });
 });
+
+/**
+ * One provider can publish several rows for the same model — a long-context
+ * tier alongside its base rate. The summary counted those rows against the
+ * model's distinct provider count, so a model with tiered routes reported
+ * more providers than it had: "11 of 9 providers".
+ */
+describe('compare_ai_model_providers summary counting', () => {
+  function tieredData() {
+    const base = buildFixture();
+    const opus = base.models.find((model) => model.id === 'claude-opus-5');
+    if (!opus) throw new Error('fixture is missing claude-opus-5');
+
+    // Alpha publishes a second, long-context row. Two providers, three rows.
+    const offers = [
+      { ...opus.offers[0]!, provider_id: 'beta', tier: null },
+      { ...opus.offers[1]!, provider_id: 'alpha', tier: null },
+      { ...opus.offers[1]!, provider_id: 'alpha', tier: '>=200k', input_usd_per_1m: 10, output_usd_per_1m: 50 },
+    ];
+    const tiered = {
+      ...opus,
+      offers,
+      provider_count: new Set(offers.map((offer) => offer.provider_id)).size,
+    };
+    return {
+      ...base,
+      models: base.models.map((model) => (model.id === 'claude-opus-5' ? tiered : model)),
+    };
+  }
+
+  async function summaryFor(data: ReturnType<typeof tieredData>) {
+    const [, compare] = buildWebMcpTools({ data });
+    return (await compare!.execute({ model: 'claude-opus-5', limit: 25 }, undefined)) as {
+      content: Array<{ text: string }>;
+      structuredContent: { returned: number; provider_count: number };
+    };
+  }
+
+  it('counts distinct providers on both sides of the ratio', async () => {
+    const result = await summaryFor(tieredData());
+    const summary = result.content[0]!.text;
+
+    // Three rows across two providers: the ratio must not read "3 of 2".
+    expect(result.structuredContent.returned).toBe(3);
+    expect(result.structuredContent.provider_count).toBe(2);
+    expect(summary).toContain('2 of 2 providers');
+    expect(summary).not.toContain('3 of 2 providers');
+  });
+
+  it('names the extra rows instead of letting them look like a miscount', async () => {
+    const summary = (await summaryFor(tieredData())).content[0]!.text;
+    expect(summary).toContain('(3 priced routes)');
+    // Every row is still listed; only the ratio changed.
+    expect(summary.split('\n').filter((line) => /^\d+\. /.test(line))).toHaveLength(3);
+  });
+
+  it('says nothing about routes when each provider publishes one row', async () => {
+    const summary = (await summaryFor(buildFixture() as never)).content[0]!.text;
+    expect(summary).toContain('providers,');
+    expect(summary).not.toContain('priced routes');
+  });
+});
