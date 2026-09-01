@@ -380,7 +380,7 @@ export function buildWebMcpTools(context: WebMcpToolContext): ModelContextTool[]
     name: 'show_ai_prices_in_page',
     title: 'Show a result in the page the user is looking at',
     description:
-      'Update the AI API Prices page the person is currently viewing so it shows the result the conversation reached: sets the search box and switches between the Models and Providers views. Pass model to put that exact model\'s price comparison on screen, or query for a freer search. Call this after answering a pricing question so the human can carry on browsing from that state instead of retyping the query. This only changes the existing on-page search and tab; it does not navigate anywhere.',
+      'Update the AI API Prices page the person is currently viewing so it shows the result the conversation reached: sets the search box and switches between the Models and Providers views. The two views search different things. Models view shows a model\'s price comparison, including every provider selling that model — that is where the answer to "which providers sell X, and which is cheapest" belongs. Providers view is the provider directory and searches provider NAMES only, so a model name typed there matches nothing. Pass model to put that exact model\'s comparison on screen; when it resolves, the tool always opens Models view and ignores any view you asked for, because a model name cannot be found in the provider directory. Pass query on its own for a freer search, and use view: "providers" with it to browse the provider directory by provider name. Call this after answering a pricing question so the human can carry on browsing from that state instead of retyping the query. This only changes the existing on-page search and tab; it does not navigate anywhere.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -399,7 +399,8 @@ export function buildWebMcpTools(context: WebMcpToolContext): ModelContextTool[]
           type: 'string',
           enum: ['models', 'providers'],
           default: 'models',
-          description: 'Which of the two existing views to show.',
+          description:
+            'Which of the two existing views to show. "models" lists model price comparisons, including the providers selling a given model — use it for anything about a model, including its cheapest providers. "providers" is the provider directory and matches provider NAMES only, so use it only when browsing for a provider such as "Surplus Intelligence". Ignored when model is supplied and resolves: that always opens the models view.',
         },
       },
       required: [],
@@ -415,12 +416,25 @@ export function buildWebMcpTools(context: WebMcpToolContext): ModelContextTool[]
       // lands on the exact card the agent was talking about rather than on
       // whatever a loose phrase happens to match.
       const requestedModel = typeof input.model === 'string' ? input.model : '';
+      let modelResolved = false;
       if (requestedModel) {
         const resolved = resolveModel(readIndex(), requestedModel);
-        if (resolved) query = resolved.display_name.slice(0, MAX_SHOW_QUERY_LENGTH);
+        if (resolved) {
+          query = resolved.display_name.slice(0, MAX_SHOW_QUERY_LENGTH);
+          modelResolved = true;
+        }
       }
 
-      const view = input.view === 'providers' ? 'providers' : 'models';
+      // The Providers view is a directory: it searches provider *names*. Put a
+      // model name into it and the page truthfully reports that no provider is
+      // called that — which is what happened in production when an agent
+      // answered "cheapest providers for GPT-5.6 Sol" and then asked for the
+      // providers view. A resolved model therefore always lands on the Models
+      // view, where that model's providers are what is listed. A query with no
+      // resolved model still honours whichever view the agent asked for, so
+      // browsing the provider directory keeps working.
+      const requestedView = input.view === 'providers' ? 'providers' : 'models';
+      const view = modelResolved ? 'models' : requestedView;
 
       if (!showInPage) {
         return ok('This page cannot be updated from here; the price explorer is not on screen.', {
