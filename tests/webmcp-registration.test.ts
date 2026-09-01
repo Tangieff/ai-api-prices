@@ -273,6 +273,55 @@ describe('tool execution', () => {
     expect(showInPage).toHaveBeenLastCalledWith({ query: 'deepseek', view: 'models' });
   });
 
+  /**
+   * Found by a production smoke test. The agent answered 'find GPT-5.6 Sol and
+   * show me its cheapest providers', then handed off with the model name and
+   * view: 'providers'. The Providers view is a directory that searches provider
+   * NAMES, so the page ended up truthfully reporting that no provider is called
+   * 'GPT-5.6 Sol' -- a dead end reached from a correct answer.
+   */
+  it('sends a resolved model to the models view even when providers was asked for', async () => {
+    const showInPage = vi.fn();
+    const tool = toolNamed('show_ai_prices_in_page', showInPage);
+
+    const result = await tool.execute({ model: 'GPT-5.6 Sol', view: 'providers' });
+
+    expect(showInPage).toHaveBeenCalledWith({ query: 'GPT-5.6 Sol', view: 'models' });
+    expect(result.structuredContent).toMatchObject({
+      applied: true,
+      query: 'GPT-5.6 Sol',
+      view: 'models',
+    });
+    // The prose the agent reads back must not claim a providers handoff either.
+    expect(result.content[0]!.text).toContain('models view');
+  });
+
+  it('still opens the models view for a resolved model that asked for it', async () => {
+    const showInPage = vi.fn();
+    const tool = toolNamed('show_ai_prices_in_page', showInPage);
+
+    await tool.execute({ model: 'opus', view: 'models' });
+    expect(showInPage).toHaveBeenCalledWith({ query: 'Claude Opus 5', view: 'models' });
+  });
+
+  it('leaves the provider directory reachable for a provider search', async () => {
+    const showInPage = vi.fn();
+    const tool = toolNamed('show_ai_prices_in_page', showInPage);
+
+    const result = await tool.execute({ query: 'Surplus Intelligence', view: 'providers' });
+
+    expect(showInPage).toHaveBeenCalledWith({ query: 'Surplus Intelligence', view: 'providers' });
+    expect(result.structuredContent).toMatchObject({ view: 'providers' });
+  });
+
+  it('does not hijack the view when the named model cannot be resolved', async () => {
+    const showInPage = vi.fn();
+    const tool = toolNamed('show_ai_prices_in_page', showInPage);
+
+    // Nothing resolved, so the agent's own choice of view still stands.
+    await tool.execute({ model: 'not-a-model', query: 'Surplus Intelligence', view: 'providers' });
+    expect(showInPage).toHaveBeenCalledWith({ query: 'Surplus Intelligence', view: 'providers' });
+  });
   it('honours an already-aborted execution signal', async () => {
     const showInPage = vi.fn();
     const controller = new AbortController();
