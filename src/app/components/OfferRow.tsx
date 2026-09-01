@@ -27,6 +27,7 @@ export function OfferRow({
 }) {
   const hasCache = offer.cache_read_usd_per_1m !== null || offer.cache_write_usd_per_1m !== null;
   const metadata = normalizeProviderMetadata(offer.tier);
+  const officialDelta = offer.official_price_delta_pct ?? null;
 
   return (
     <tr data-best={offer.is_best ? 'true' : 'false'}>
@@ -62,9 +63,15 @@ export function OfferRow({
           : '—'}
       </td>
 
-      <td data-label="Save vs official">
-        {offer.discount_pct !== null ? (
-          <span className="badge-save">−{formatPercent(offer.discount_pct)}%</span>
+      <td data-label="Vs official">
+        {officialDelta !== null ? (
+          officialDelta < 0 ? (
+            <span className="badge-save">−{formatPercent(Math.abs(officialDelta))}%</span>
+          ) : officialDelta === 0 ? (
+            <span className="num num--muted">Official price</span>
+          ) : (
+            <span className="num num--muted">+{formatPercent(officialDelta)}%</span>
+          )
         ) : (
           <span
             className="num num--muted"

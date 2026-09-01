@@ -36,7 +36,9 @@ export interface OfferView {
   cache_read_usd_per_1m: number | null;
   cache_write_usd_per_1m: number | null;
   discount_pct: number | null;
-  /** Why a public saving badge is unavailable, used by the accessible dash. */
+  /** Signed price difference versus the official baseline: negative is cheaper. */
+  official_price_delta_pct?: number | null;
+  /** Why a public comparison is unavailable, used by the accessible dash. */
   discount_unavailable_reason: string | null;
   observed_at: string;
   tier: string | null;
@@ -81,12 +83,28 @@ export interface PageData {
   total_offers: number;
 }
 
+function officialPriceDeltaPct(
+  offer: Pick<Offer, 'input_usd_per_1m' | 'output_usd_per_1m'>,
+  baseline: OfficialPriceBaseline,
+): number | null {
+  const offerScore = costScoreMicros(offer);
+  const baselineScore = costScoreMicros(baseline);
+  if (offerScore === null || baselineScore === null || baselineScore <= 0) return null;
+  const pct = ((offerScore - baselineScore) / baselineScore) * 100;
+  const rounded = Math.round(pct * 10) / 10;
+  return Object.is(rounded, -0) ? 0 : rounded;
+}
+
 function toOfferView(offer: Offer, isBest: boolean, stale: boolean, now: Date): OfferView | null {
   if (!PROVIDERS_BY_ID.has(offer.provider_id)) return null;
   const comparison = officialPriceComparison(offer, now);
   const discount =
     comparison.comparable && comparison.baseline
       ? offerDiscountAgainstOfficial(offer, comparison.baseline)
+      : null;
+  const officialPriceDelta =
+    comparison.comparable && comparison.baseline
+      ? officialPriceDeltaPct(offer, comparison.baseline)
       : null;
   const discountUnavailableReason =
     comparison.unavailable_reason ??
@@ -102,6 +120,7 @@ function toOfferView(offer: Offer, isBest: boolean, stale: boolean, now: Date): 
     cache_read_usd_per_1m: offer.cache_read_usd_per_1m,
     cache_write_usd_per_1m: offer.cache_write_usd_per_1m,
     discount_pct: discount,
+    official_price_delta_pct: officialPriceDelta,
     discount_unavailable_reason: discountUnavailableReason,
     observed_at: offer.observed_at,
     tier: offer.tier,

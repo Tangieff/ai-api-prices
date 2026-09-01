@@ -53,8 +53,11 @@ export function ModelCard({
             <th scope="col">Input / 1M</th>
             <th scope="col">Output / 1M</th>
             <th scope="col">Cache R / W</th>
-            <th scope="col" title="Saving versus the model maker's standard API price">
-              Save vs official
+            <th
+              scope="col"
+              title="Price versus the model maker's standard API price, using input + 3× output"
+            >
+              Vs official
             </th>
             <th scope="col">Updated</th>
             <th scope="col">
